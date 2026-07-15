@@ -1,81 +1,3 @@
-<!-- <script lang="ts">
-	import type { PageData } from './$types';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Card from '$lib/components/ui/card/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import CopyIcon from '@lucide/svelte/icons/copy';
-
-    import LivePlayer from '$lib/components/live-player.svelte';
-
-    
-
-	let { data }: { data: PageData } = $props();
-	const live = data.live;
-
-    let liveStream = $derived(live);
-
-	let copiedField = $state<string | null>(null);
-
-	async function copy(value: string, field: string) {
-		await navigator.clipboard.writeText(value);
-		copiedField = field;
-		setTimeout(() => (copiedField = null), 1500);
-	}
-</script>
-
-<div class="mx-auto max-w-2xl space-y-6 p-6">
-	<div class="flex items-center justify-between">
-		<div>
-			<h1 class="text-2xl font-semibold">{live.title}</h1>
-			<Badge variant={live.status === 'live' ? 'default' : 'secondary'} class="mt-2">
-				{live.status}
-			</Badge>
-		</div>
-	</div>
-
-    <LivePlayer playbackId={liveStream.playback_id} title="Mon Live" />
-
-	<Card.Root>
-		<Card.Header>
-			<Card.Title>Configuration OBS</Card.Title>
-			<Card.Description>Utilise ces informations pour démarrer ton stream.</Card.Description>
-		</Card.Header>
-		<Card.Content class="space-y-4">
-			<div class="grid gap-2">
-				<span class="text-muted-foreground text-sm">URL du serveur (RTMP)</span>
-				<div class="flex items-center gap-2">
-					<code class="bg-muted flex-1 truncate rounded-md px-3 py-2 text-sm">{live.rtmp_url}</code>
-					<Button variant="outline" size="icon" onclick={() => copy(live.rtmp_url, 'rtmp')}>
-						<CopyIcon class="size-4" />
-					</Button>
-				</div>
-				{#if copiedField === 'rtmp'}
-					<span class="text-xs text-green-600">Copié</span>
-				{/if}
-			</div>
-
-			<div class="grid gap-2">
-				<span class="text-muted-foreground text-sm">Clé de stream</span>
-				<div class="flex items-center gap-2">
-					<code class="bg-muted flex-1 truncate rounded-md px-3 py-2 text-sm">{live.stream_key}</code>
-					<Button variant="outline" size="icon" onclick={() => copy(live.stream_key, 'key')}>
-						<CopyIcon class="size-4" />
-					</Button>
-				</div>
-				{#if copiedField === 'key'}
-					<span class="text-xs text-green-600">Copié</span>
-				{/if}
-			</div>
-		</Card.Content>
-	</Card.Root>
-
-	{#if live.schedule_at}
-		<p class="text-muted-foreground text-sm">
-			Programmé pour {new Date(live.schedule_at).toLocaleString()}
-		</p>
-	{/if}
-</div> -->
-
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -85,6 +7,7 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 
 	import LivePlayer from '$lib/components/live-player.svelte';
+	import LiveChat from '$lib/components/live-chat.svelte';
 
 	let { data }: { data: PageData } = $props();
 	const live = data.live;
@@ -99,6 +22,14 @@
 		copiedField = field;
 		setTimeout(() => (copiedField = null), 1500);
 	}
+
+    const messages = [
+	{ id: '1', username: 'Lea', content: 'salut tout le monde !' },
+	{ id: '2', username: 'Marc', content: 'le son est nickel aujourd\'hui' },
+	{ id: '3', username: 'Sofia', content: 'vous commencez a quelle heure ?' },
+	{ id: '4', username: 'Theo', content: 'hate de voir la suite' },
+	{ id: '5', username: 'Alex', content: 'super qualite de stream' }
+];
 </script>
 
 {#snippet credentialField(label: string, value: string, field: string)}
@@ -161,4 +92,7 @@
 			{@render credentialField('Clé de stream', live.stream_key, 'key')}
 		</Card.Content>
 	</Card.Root>
+    <div class="mx-auto max-w-md p-6">
+	<LiveChat {messages} viewerCount={128} />
+</div>
 </div>
