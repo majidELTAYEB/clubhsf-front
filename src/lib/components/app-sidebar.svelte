@@ -21,20 +21,20 @@
 				url: "#",
 				icon: SquareTerminalIcon,
 				isActive: true,
-				items: [
-					{
-						title: "History",
-						url: "#",
-					},
-					{
-						title: "Starred",
-						url: "#",
-					},
-					{
-						title: "Settings",
-						url: "#",
-					},
-				],
+				// items: [
+				// 	{
+				// 		title: "History",
+				// 		url: "#",
+				// 	},
+				// 	{
+				// 		title: "Starred",
+				// 		url: "#",
+				// 	},
+				// 	{
+				// 		title: "Settings",
+				// 		url: "#",
+				// 	},
+				// ],
 			},
 			{
 				title: "Models",
@@ -116,7 +116,7 @@
 		],
 		projects: [
 			{
-				name: "Design Engineering",
+				name: "Configuration Live",
 				url: "#",
 				icon: FrameIcon,
 			},
@@ -146,7 +146,7 @@
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 </script>
 
-<Sidebar.Root bind:ref variant="inset" {...restProps}>
+<Sidebar.Root bind:ref variant="floating" {...restProps}>
 	<Sidebar.Header>
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
