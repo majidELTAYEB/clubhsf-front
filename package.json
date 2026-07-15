@@ -46,6 +46,7 @@
 	},
 	"dependencies": {
 		"@auth0/auth0-spa-js": "^2.23.0",
+		"@mux/mux-player": "^3.13.0",
 		"jose": "^6.2.3",
 		"jwt-decode": "^4.0.0",
 		"mode-watcher": "^1.1.0"

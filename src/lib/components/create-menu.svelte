@@ -81,7 +81,7 @@
 	import { Button } from "$lib/components/ui/button/index.js";
 	// import { LayoutGrid, FileText, Upload, Chrome } from "@lucide/svelte";
 
-    import CreateLive from "./create-live.svelte";
+    import CreateLive from "../features/newLive/components/create-live.svelte";
 	import LayoutGrid from "@lucide/svelte/icons/layout-grid";
 	import FileText from "@lucide/svelte/icons/file-text";
 	import Upload from "@lucide/svelte/icons/upload";
