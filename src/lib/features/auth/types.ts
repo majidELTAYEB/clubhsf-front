@@ -13,3 +13,16 @@ export interface TokenSet {
   expires_in: number;
   token_type: string;
 }
+
+export interface ViewerCountResponse {
+  viewers: number;
+}
+
+export interface ChatHistoryResponse {
+  messages : [
+    {
+      viewerId : string;
+      content: string
+    }
+  ]
+}

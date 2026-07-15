@@ -9,7 +9,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 
   const params = new URLSearchParams({
     client_id: AUTH0_CLIENT_ID,
-    returnTo: PUBLIC_APP_URL
+    returnTo: `${PUBLIC_APP_URL}/auth`
   });
 
   throw redirect(302, `${AUTH0_LOGOUT_URL}?${params.toString()}`);

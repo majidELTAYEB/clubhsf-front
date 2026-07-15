@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
   const verifier = generateCodeVerifier();
   const challenge = generateCodeChallenge(verifier);
   const state = generateState();
-  const redirectTo = url.searchParams.get('redirectTo') ?? '/';
+  const redirectTo = url.searchParams.get('redirectTo') ?? '/home';
 
   const cookieOpts = { path: '/', httpOnly: true, secure: true, maxAge: 600, sameSite: 'lax' as const };
   cookies.set('auth0_verifier', verifier, cookieOpts);

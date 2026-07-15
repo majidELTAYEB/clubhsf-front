@@ -64,10 +64,15 @@ export const handle: Handle = async ({ event, resolve }) => {
   event.locals.user = user;
   event.locals.accessToken = accessToken ?? null;
 
-  const protectedRoutes = ['/dashboard', '/profile', '/upload'];
-  if (protectedRoutes.some((r) => event.url.pathname.startsWith(r)) && !event.locals.user) {
-    return new Response(null, { status: 302, headers: { location: `/auth/login?redirectTo=${event.url.pathname}` } });
-  }
+const publicRoutes = ['/', '/auth/login', '/auth/callback', '/auth/logout', '/auth'];
+const isPublicRoute = publicRoutes.includes(event.url.pathname) || event.url.pathname.startsWith('/api/');
+
+if (!isPublicRoute && !event.locals.user) {
+  return new Response(null, {
+    status: 302,
+    headers: { location: `/auth/login?redirectTo=${event.url.pathname}` }
+  });
+}
 
   return resolve(event);
 };

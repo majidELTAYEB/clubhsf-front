@@ -8,7 +8,7 @@ export const GET: RequestHandler = async ({ url, cookies, fetch }) => {
   const state = url.searchParams.get('state');
   const storedState = cookies.get('auth0_state');
   const verifier = cookies.get('auth0_verifier');
-  const redirectTo = cookies.get('auth0_redirect') ?? '/';
+  const redirectTo = cookies.get('auth0_redirect') ?? '/auth';
 
   cookies.delete('auth0_state', { path: '/' });
   cookies.delete('auth0_verifier', { path: '/' });
