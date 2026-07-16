@@ -174,7 +174,7 @@
 		};
 
 		try {
-			await newLive(payload);
+			const live = await newLive(payload);
 			open = false;
 			await goto(resolve(`/admin/live/${live.id}`));
 		} catch (err) {

@@ -34,7 +34,7 @@
 	let { data }: { data: PageData } = $props();
 	let lives = $derived(data.lives);
 
-	let liveLives = $derived(lives.filter((l) => l.status === 'active'));
+	let liveLives = $derived(lives.filter((l) => l.status === 'active' || l.status === 'disconnected' ));
 	let upcomingLives = $derived(lives.filter((l) => l.status === 'scheduled'));
 	let pastLives = $derived(lives.filter((l) => l.status === 'ended' || l.status === 'canceled'));
 

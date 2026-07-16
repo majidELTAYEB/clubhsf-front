@@ -14,7 +14,7 @@
 	let { data }: { data: PageData } = $props();
 	let live = $derived(data.live);
 
-	let isLive = $derived(live?.status === 'active');
+	let isLive = $derived(live?.status === 'active' || live?.status === 'disconnected');
 	let isScheduled = $derived(live?.status === 'scheduled');
 	let isInactive = $derived(live?.status === 'ended' || live?.status === 'canceled');
 
