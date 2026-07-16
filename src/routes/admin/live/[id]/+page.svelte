@@ -93,6 +93,6 @@
 		</Card.Content>
 	</Card.Root>
     <div class="mx-auto max-w-md p-6">
-	<LiveChat {messages} viewerCount={128} />
+	<!-- <LiveChat {messages} viewerCount={128} /> -->
 </div>
 </div>
