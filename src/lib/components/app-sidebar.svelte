@@ -1,13 +1,10 @@
 <script lang="ts" module>
-	import BookOpenIcon from "@lucide/svelte/icons/book-open";
-	import BotIcon from "@lucide/svelte/icons/bot";
-	import ChartPieIcon from "@lucide/svelte/icons/chart-pie";
-	import FrameIcon from "@lucide/svelte/icons/frame";
 	import LifeBuoyIcon from "@lucide/svelte/icons/life-buoy";
-	import MapIcon from "@lucide/svelte/icons/map";
 	import SendIcon from "@lucide/svelte/icons/send";
 	import Settings2Icon from "@lucide/svelte/icons/settings-2";
-	import SquareTerminalIcon from "@lucide/svelte/icons/square-terminal";
+	import Tv from "@lucide/svelte/icons/tv";
+	import Clapperboard from "@lucide/svelte/icons/clapperboard";
+	import Videotape from "@lucide/svelte/icons/videotape";
 
 	const data = {
 		user: {
@@ -17,9 +14,9 @@
 		},
 		navMain: [
 			{
-				title: "Playground",
+				title: "Masterclass",
 				url: "#",
-				icon: SquareTerminalIcon,
+				icon: Clapperboard,
 				isActive: true,
 				// items: [
 				// 	{
@@ -37,69 +34,39 @@
 				// ],
 			},
 			{
-				title: "Models",
-				url: "#",
-				icon: BotIcon,
-				items: [
-					{
-						title: "Genesis",
-						url: "#",
-					},
-					{
-						title: "Explorer",
-						url: "#",
-					},
-					{
-						title: "Quantum",
-						url: "#",
-					},
-				],
+				title: "Live",
+				url: "/lives",
+				icon: Tv,
+				isActive: true,
 			},
 			{
-				title: "Documentation",
+				title: "Replay Live",
 				url: "#",
-				icon: BookOpenIcon,
-				items: [
-					{
-						title: "Introduction",
-						url: "#",
-					},
-					{
-						title: "Get Started",
-						url: "#",
-					},
-					{
-						title: "Tutorials",
-						url: "#",
-					},
-					{
-						title: "Changelog",
-						url: "#",
-					},
-				],
+				icon: Videotape,
+				isActive: true,
 			},
 			{
 				title: "Settings",
 				url: "#",
 				icon: Settings2Icon,
-				items: [
-					{
-						title: "General",
-						url: "#",
-					},
-					{
-						title: "Team",
-						url: "#",
-					},
-					{
-						title: "Billing",
-						url: "#",
-					},
-					{
-						title: "Limits",
-						url: "#",
-					},
-				],
+				// items: [
+				// 	{
+				// 		title: "General",
+				// 		url: "#",
+				// 	},
+				// 	{
+				// 		title: "Team",
+				// 		url: "#",
+				// 	},
+				// 	{
+				// 		title: "Billing",
+				// 		url: "#",
+				// 	},
+				// 	{
+				// 		title: "Limits",
+				// 		url: "#",
+				// 	},
+				// ],
 			},
 		],
 		navSecondary: [
@@ -114,21 +81,11 @@
 				icon: SendIcon,
 			},
 		],
-		projects: [
+		admin: [
 			{
 				name: "Configuration Live",
 				url: "#",
-				icon: FrameIcon,
-			},
-			{
-				name: "Sales & Marketing",
-				url: "#",
-				icon: ChartPieIcon,
-			},
-			{
-				name: "Travel",
-				url: "#",
-				icon: MapIcon,
+				icon: Tv,
 			},
 		],
 	};
@@ -170,7 +127,7 @@
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<NavMain items={data.navMain} />
-		<NavProjects projects={data.projects} />
+		<NavProjects projects={data.admin} />
 		<NavSecondary items={data.navSecondary} class="mt-auto" />
 	</Sidebar.Content>
 	<Sidebar.Footer>
