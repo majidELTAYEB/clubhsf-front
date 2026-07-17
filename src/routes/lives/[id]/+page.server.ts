@@ -12,5 +12,8 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 	}
 
 	const live = await res.json();
-	return { live };
+
+	const chatRes = await fetch(`/api/telemetry/${params.id}/chat`);
+	const chatHistory = chatRes.ok ? (await chatRes.json()).messages : [];
+	return { live, chatHistory };
 };

@@ -14,9 +14,7 @@ export interface TokenSet {
   token_type: string;
 }
 
-export interface ViewerCountResponse {
-  viewers: number;
-}
+
 
 export interface ChatHistoryResponse {
   messages : [

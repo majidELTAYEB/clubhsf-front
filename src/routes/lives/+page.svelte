@@ -1,31 +1,3 @@
-<!-- src/routes/lives/+page.svelte
-<script lang="ts">
-	import type { PageData } from './$types';
-	import LiveCard  from '$lib/components/live-card.svelte';
-
-	let { data }: { data: PageData } = $props();
-	let lives = $derived(data.lives);
-</script>
-
-<div class="mx-auto w-full space-y-6 p-6">
-	<h1 class="text-2xl font-semibold tracking-tight">Lives</h1>
-
-	{#if lives.length === 0}
-		<p class="text-muted-foreground text-sm">Aucun live pour le moment.</p>
-	{:else}
-		<div
-			class="grid gap-x-[60px] gap-y-[60px]"
-			style="grid-template-columns: repeat(auto-fill, minmax(280px, 350px));"
-		>
-			{#each lives as live (live.id)}
-				<LiveCard id={live.id} title={live.title} coverSrc={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYgL_GL13WTqfNUPVSCoPss4QMTCdJxR8hPotmPpg_m_yeHiM4mGaVJ6s&s=10"} status={live.status} scheduleAt={live.schedule_at} />
-			{/each}
-		</div>
-	{/if}
-</div> -->
-
-
-<!-- src/routes/lives/+page.svelte -->
 <script lang="ts">
 	import type { PageData } from './$types';
 	import LiveCard from '$lib/components/live-card.svelte';

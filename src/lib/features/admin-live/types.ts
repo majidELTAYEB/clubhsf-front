@@ -8,3 +8,16 @@ export interface LiveResponse {
   rtmp_url: string;
   playback_id: string;
 }
+
+export interface ViewerCountResponse {
+  viewers: number;
+}
+
+export interface ChatHistoryResponse {
+  messages : [
+    {
+      viewerId : string;
+      content: string
+    }
+  ]
+}
