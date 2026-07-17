@@ -84,7 +84,7 @@
 		admin: [
 			{
 				name: "Configuration Live",
-				url: "#",
+				url: "/admin/lives",
 				icon: Tv,
 			},
 		],
