@@ -9,3 +9,13 @@ export async function getUploadCredentials(videoId: string) {
     return api.get<UploadCredentials>(`/videos/${videoId}/upload-credentials`);
 
 }
+
+export const  getCollections = [
+    { ID: 1, Name: "yooo"},
+     { ID: 1, Name: "yooo"}
+]
+
+export async function createCollection(videoId: string) {
+    return 'heee';
+
+}
