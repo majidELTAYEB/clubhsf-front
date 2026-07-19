@@ -8,6 +8,7 @@
 import './layout.css';
 import { ModeWatcher } from 'mode-watcher';
 import { setUser, authState } from '$lib/features/auth/store';
+import { Toaster } from "svelte-sonner";
 	import type { LayoutData } from './$types';
 	import type { Snippet } from "svelte";
 
@@ -19,6 +20,7 @@ import { setUser, authState } from '$lib/features/auth/store';
 </script>
 <ModeWatcher defaultMode="dark" />
 {#if $authState.isAuthenticated}
+<Toaster position="top-center" richColors theme="dark" />
 <Sidebar.Provider>
   <AppSidebar />
   <Sidebar.Inset>
