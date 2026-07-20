@@ -63,6 +63,7 @@
 		"jwt-decode": "^4.0.0",
 		"layerchart": "^2.0.1",
 		"mode-watcher": "^1.1.0",
+		"svelte-dnd-action": "^0.9.74",
 		"tus-js-client": "^4.3.1"
 	}
 }

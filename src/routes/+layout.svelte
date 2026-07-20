@@ -20,7 +20,7 @@ import { Toaster } from "svelte-sonner";
 </script>
 <ModeWatcher defaultMode="dark" />
 {#if $authState.isAuthenticated}
-<Toaster position="top-center" richColors theme="dark" />
+<Toaster position="top-center" richColors theme="dark"  />
 <Sidebar.Provider>
   <AppSidebar />
   <Sidebar.Inset>

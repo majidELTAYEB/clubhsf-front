@@ -87,6 +87,11 @@
 				url: "/admin/lives",
 				icon: Tv,
 			},
+			{
+				name: "Configuration Collections",
+				url: "/admin/collections",
+				icon: Tv,
+			},
 		],
 	};
 </script>
