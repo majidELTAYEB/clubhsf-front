@@ -603,10 +603,6 @@
                     {/each}
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
-            <Button size="sm">
-                <PlusIcon class="mr-2 h-4 w-4" />
-                <span class="hidden lg:inline">Nouveau Live</span>
-            </Button>
         </div>
     </div>
 

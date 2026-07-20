@@ -1,5 +1,5 @@
 import { api } from '$lib/services/api';
-import type { NewVideoRequest, NewVideoResponse, UploadCredentials } from './types';
+import type { NewVideoRequest, NewVideoResponse, UploadCredentials, NewCollectionRequest, Collection, CollectionsResponse, CollectionResponse } from './types';
 
 export function createVideo(body : NewVideoRequest) {
   return api.post<NewVideoResponse>('/videos', body);
@@ -10,12 +10,14 @@ export async function getUploadCredentials(videoId: string) {
 
 }
 
-export const  getCollections = [
-    { ID: 1, Name: "yooo"},
-     { ID: 1, Name: "yooo"}
-]
+export function getCollections() {
+  return api.get<CollectionsResponse>(`/collections`);
+}
 
-export async function createCollection(videoId: string) {
-    return 'heee';
+export function createCollection(body: NewCollectionRequest) {
+  return api.post<CollectionResponse>('/collections', body);
+}
 
+export function addVideoToCollection(collectionId: string, videoId: string) {
+  return api.post<Collection>(`/collections/${collectionId}/videos`, { video_id: videoId });
 }
