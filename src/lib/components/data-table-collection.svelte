@@ -29,7 +29,7 @@
         },
         {
             accessorKey: "title",
-            header: "Formation",
+            header: "Titre",
         },
         {
             accessorKey: "video_count",
@@ -110,6 +110,11 @@
     import { move } from "@dnd-kit/helpers";
     import { useSortable } from "@dnd-kit-svelte/svelte/sortable";
 	import { updateCollection } from "$lib/features/admin-collection/api";
+       import {
+        createCollection,
+
+    } from "../features/new-video/api";
+
 
     // ⚠️ Adapte le chemin d'import selon ton projet
     // import { deleteCollection, updateCollection, createCollection } from "$lib/api";
@@ -156,7 +161,7 @@
 
     // 4. Onglets, calculés dynamiquement à partir des données reçues
     let views = $derived([
-        { id: "all", label: "Toutes les formations", badge: 0 },
+        { id: "all", label: "Toutes les collections", badge: 0 },
         { id: "published", label: "Publiées", badge: data.filter((d) => d.is_public).length },
         { id: "draft", label: "Brouillons", badge: data.filter((d) => !d.is_public).length },
     ]);
@@ -190,7 +195,7 @@
 
         try {
             await updateCollection(collection.id, { is_public: !previous });
-            toast.success(!previous ? "Formation publiée" : "Formation repassée en brouillon");
+            toast.success(!previous ? "Collection publiée" : "Collection repassée en brouillon");
         } catch (err) {
             data[index] = { ...data[index], is_public: previous };
             toast.error("Impossible de mettre à jour la visibilité");
@@ -222,18 +227,18 @@
         const title = newTitle.trim();
         if (title === "") return;
         isCreating = true;
-        // try {
-        //     const newCollection = await createCollection({ title });
-        //     data = [newCollection, ...data];
-        //     isCreateDialogOpen = false;
-        //     newTitle = "";
-        //     toast.success(`"${newCollection.title}" créée`);
-        //     goto(`/admin/collections/${newCollection.id}`);
-        // } catch (err) {
-        //     toast.error("Impossible de créer la formation");
-        // } finally {
-        //     isCreating = false;
-        // }
+        try {
+            const newCollection = await createCollection({ title });
+            data = [newCollection, ...data];
+            isCreateDialogOpen = false;
+            newTitle = "";
+            toast.success(`"${newCollection.title}" créée`);
+            goto(`/admin/collections/${newCollection.id}`);
+        } catch (err) {
+            toast.error("Impossible de créer la formation");
+        } finally {
+            isCreating = false;
+        }
     }
 </script>
 
@@ -288,7 +293,7 @@
             </DropdownMenu.Root>
             <Button size="sm" onclick={() => (isCreateDialogOpen = true)}>
                 <PlusIcon class="mr-2 h-4 w-4" />
-                <span class="hidden lg:inline">Nouvelle formation</span>
+                <span class="hidden lg:inline">Nouvelle collection</span>
                 <span class="lg:hidden">Nouvelle</span>
             </Button>
         </div>
@@ -334,7 +339,7 @@
                         {:else}
                             <Table.Row>
                                 <Table.Cell colspan={columns.length} class="h-24 text-center">
-                                    Aucune formation trouvée.
+                                    Aucune collection trouvée.
                                 </Table.Cell>
                             </Table.Row>
                         {/if}
@@ -511,14 +516,14 @@
 <AlertDialog.Root bind:open={isCreateDialogOpen}>
     <AlertDialog.Content>
         <AlertDialog.Header>
-            <AlertDialog.Title>Nouvelle formation</AlertDialog.Title>
+            <AlertDialog.Title>Nouvelle collection</AlertDialog.Title>
             <AlertDialog.Description>
-                Donne un titre à ta formation, tu pourras ajouter les vidéos et lives ensuite.
+                Donne un titre à ta collection, tu pourras ajouter les vidéos et lives ensuite.
             </AlertDialog.Description>
         </AlertDialog.Header>
         <Input
             bind:value={newTitle}
-            placeholder="Formation débutant 2026"
+            placeholder="Collection débutant 2026"
             onkeydown={(e) => {
                 if (e.key === "Enter") {
                     e.preventDefault();
@@ -545,7 +550,7 @@
         <AlertDialog.Header>
             <AlertDialog.Title>Supprimer "{collectionToDelete?.title}" ?</AlertDialog.Title>
             <AlertDialog.Description>
-                Cette action est irréversible. La formation sera supprimée, mais les vidéos
+                Cette action est irréversible. La collection sera supprimée, mais les vidéos
                 qu'elle contient resteront disponibles ailleurs.
             </AlertDialog.Description>
         </AlertDialog.Header>

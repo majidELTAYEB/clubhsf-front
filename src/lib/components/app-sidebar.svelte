@@ -15,7 +15,7 @@
 		navMain: [
 			{
 				title: "Masterclass",
-				url: "#",
+				url: "/masterclass",
 				icon: Clapperboard,
 				isActive: true,
 				// items: [
@@ -45,40 +45,12 @@
 				icon: Videotape,
 				isActive: true,
 			},
-			{
-				title: "Settings",
-				url: "#",
-				icon: Settings2Icon,
-				// items: [
-				// 	{
-				// 		title: "General",
-				// 		url: "#",
-				// 	},
-				// 	{
-				// 		title: "Team",
-				// 		url: "#",
-				// 	},
-				// 	{
-				// 		title: "Billing",
-				// 		url: "#",
-				// 	},
-				// 	{
-				// 		title: "Limits",
-				// 		url: "#",
-				// 	},
-				// ],
-			},
 		],
 		navSecondary: [
 			{
 				title: "Support",
 				url: "#",
 				icon: LifeBuoyIcon,
-			},
-			{
-				title: "Feedback",
-				url: "#",
-				icon: SendIcon,
 			},
 		],
 		admin: [

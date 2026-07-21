@@ -18,7 +18,7 @@ import { Toaster } from "svelte-sonner";
 		setUser(data.user);
 	});
 </script>
-<ModeWatcher defaultMode="dark" />
+<ModeWatcher defaultMode="light" />
 {#if $authState.isAuthenticated}
 <Toaster position="top-center" richColors theme="dark"  />
 <Sidebar.Provider>
@@ -27,7 +27,7 @@ import { Toaster } from "svelte-sonner";
     <header class="flex h-16 shrink-0 items-center gap-2 justify-between ">
       <div class="flex items-center gap-2 px-4">
         <Sidebar.Trigger class="-ms-1" />
-        <Separator orientation="vertical" class="me-2 data-[orientation=vertical]:h-4" />
+        <!-- <Separator orientation="vertical" class="me-2 data-[orientation=vertical]:h-4" />
         <Breadcrumb.Root>
           <Breadcrumb.List>
             <Breadcrumb.Item class="hidden md:block">
@@ -38,7 +38,7 @@ import { Toaster } from "svelte-sonner";
               <Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
             </Breadcrumb.Item>
           </Breadcrumb.List>
-        </Breadcrumb.Root>
+        </Breadcrumb.Root> -->
       </div>
 	  <div class="px-4">
 <CreateMenu/>

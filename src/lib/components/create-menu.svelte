@@ -11,6 +11,7 @@
     import Plus from "@lucide/svelte/icons/plus";
 
     let createLiveOpen = $state(false);
+    let createVideoOpen = $state(false);
     let dropdownOpen = $state(false);
     
 </script>
@@ -34,7 +35,11 @@
 			</div>
 		</DropdownMenu.Item>
 
-		<DropdownMenu.Item class="border-border bg-background h-14.5 gap-4 rounded-2xl border px-4 py-3">
+		<DropdownMenu.Item onSelect={(e) => {
+				e.preventDefault();
+                dropdownOpen = false;
+				setTimeout(() => (createVideoOpen = true), 0);
+			}} class="border-border bg-background h-14.5 gap-4 rounded-2xl border px-4 py-3">
 			<FileText class="size-5 shrink-0" />
 			<div class="flex flex-col gap-0.5">
 				<span class="text-sm font-medium">Nouvelle VOD</span>
@@ -52,5 +57,5 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<!-- <CreateLive bind:open={createLiveOpen} /> -->
-<UploadVideo bind:open={createLiveOpen}/>
+<CreateLive bind:open={createLiveOpen} />
+<UploadVideo bind:open={createVideoOpen}/>
