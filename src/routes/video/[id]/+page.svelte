@@ -41,7 +41,7 @@
     });
 </script>
 
-<div class="container mx-auto max-w-4xl px-4 py-10">
+<div class="container mx-auto w-full px-4 py-10">
     <!-- Navigation Retour -->
     <button
 	type="button"
