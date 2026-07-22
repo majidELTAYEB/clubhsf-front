@@ -1,83 +1,5 @@
-<!-- src/lib/components/live-chat.svelte
-<script lang="ts">
-	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import SendIcon from '@lucide/svelte/icons/send';
-
-	type Message = {
-		id: string;
-		username: string;
-		content: string;
-		avatarUrl?: string;
-	};
-
-	let {
-		messages,
-		onSend,
-		disabled = false,
-		placeholder = 'Écrire un message...'
-	}: {
-		messages: Message[];
-		onSend?: (content: string) => void;
-		disabled?: boolean;
-		placeholder?: string;
-	} = $props();
-
-	let draft = $state('');
-	let scrollContainer: HTMLDivElement;
-
-	function handleSubmit(e: SubmitEvent) {
-		e.preventDefault();
-		if (!draft.trim() || !onSend) return;
-		onSend(draft.trim());
-		draft = '';
-	}
-
-	$effect(() => {
-		messages.length;
-		scrollContainer?.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
-	});
-</script>
-
-<div class="flex h-[80%] w-full flex-col rounded-xl border">
-	<div class="flex items-center justify-between border-b px-4 py-3">
-		<p class="text-sm font-medium">Chat en direct</p>
-	</div>
-
-	<div bind:this={scrollContainer} class="flex-1 space-y-3 overflow-y-auto px-4 py-4">
-		{#each messages as msg (msg.id)}
-			<div class="flex items-start gap-2">
-				<Avatar class="size-6">
-					<AvatarImage src={msg.avatarUrl} alt={msg.username} />
-					<AvatarFallback class="text-xs">{msg.username[0]}</AvatarFallback>
-				</Avatar>
-				<div class="text-sm">
-					<span class="font-medium">{msg.username}</span>
-					<span class="text-muted-foreground ml-1">{msg.content}</span>
-				</div>
-			</div>
-		{:else}
-			<p class="text-muted-foreground text-sm">Aucun message pour le moment.</p>
-		{/each}
-	</div>
-
-	{#if onSend}
-		<form onsubmit={handleSubmit} class="flex items-center gap-2 border-t p-3">
-			<Input bind:value={draft} {placeholder} {disabled} class="flex-1" />
-			<Button type="submit" size="icon" disabled={disabled || !draft.trim()}>
-				<SendIcon class="size-4" />
-			</Button>
-		</form>
-	{/if}
-</div> -->
-
-
 <!-- src/lib/components/live-chat.svelte -->
-<!-- <script lang="ts">
-	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
+<script lang="ts">
 	import SendIcon from '@lucide/svelte/icons/send';
 
 	type Message = {
@@ -91,7 +13,7 @@
 		messages,
 		onSend,
 		disabled = false,
-		placeholder = 'Écrire un message...',
+		placeholder = 'Écrire un message…',
 		viewerCount
 	}: {
 		messages: Message[];
@@ -117,124 +39,237 @@
 	});
 </script>
 
-<div class="flex h-full w-full flex-col rounded-xl border">
-	<div class="flex items-center justify-between border-b px-4 py-3">
-		<p class="text-sm font-medium">Chat en direct</p>
+<div class="chat">
+	<div class="chat__head">
+		<span class="chat__title">Chat en direct</span>
 		{#if viewerCount !== undefined}
-			<span class="text-muted-foreground text-xs">{viewerCount} spectateurs</span>
-		{/if}
-	</div>
-
-	<div bind:this={scrollContainer} class="flex-1 space-y-3 overflow-y-auto px-4 py-4">
-		{#each messages as msg (msg.id)}
-			<div class="flex items-start gap-2">
-				<Avatar class="size-6 " >
-					<AvatarImage src={msg.avatarUrl} alt={msg.username} />
-					<AvatarFallback class="text-xs">{msg.username[0]}</AvatarFallback>
-				</Avatar>
-				<div class="text-sm">
-					<span class="font-medium">{msg.username}</span>
-					<span class="text-muted-foreground ml-1">{msg.content}</span>
-				</div>
-			</div>
-		{:else}
-			<p class="text-muted-foreground text-sm">Aucun message pour le moment.</p>
-		{/each}
-	</div>
-
-	{#if onSend}
-		<form onsubmit={handleSubmit} class="flex items-center gap-2 border-t p-3">
-			<Input bind:value={draft} {placeholder} {disabled} class="flex-1" />
-			<Button type="submit" size="icon" disabled={disabled || !draft.trim()}>
-				<SendIcon class="size-4" />
-			</Button>
-		</form>
-	{/if}
-</div> -->
-
-<!-- src/lib/components/live-chat.svelte -->
-<script lang="ts">
-	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import SendIcon from '@lucide/svelte/icons/send';
-
-	type Message = {
-		id: string;
-		username: string;
-		content: string;
-		avatarUrl?: string;
-	};
-
-	let {
-		messages,
-		onSend,
-		disabled = false,
-		placeholder = 'Écrire un message...',
-		viewerCount
-	}: {
-		messages: Message[];
-		onSend?: (content: string) => void;
-		disabled?: boolean;
-		placeholder?: string;
-		viewerCount?: number;
-	} = $props();
-
-	let draft = $state('');
-	let scrollContainer: HTMLDivElement;
-
-	function handleSubmit(e: SubmitEvent) {
-		e.preventDefault();
-		if (!draft.trim() || !onSend) return;
-		onSend(draft.trim());
-		draft = '';
-	}
-
-	$effect(() => {
-		messages.length;
-		scrollContainer?.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
-	});
-</script>
-
-<div class="flex h-full w-full flex-col border border-border bg-card">
-	<div class="flex items-center justify-between border-b border-border px-4 py-3">
-		<p class="text-sm font-semibold text-foreground">Chat en direct</p>
-		{#if viewerCount !== undefined}
-			<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
-				<span class="relative flex size-1.5">
-					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
-					<span class="relative inline-flex size-1.5 rounded-full bg-red-500"></span>
-				</span>
+			<span class="chat__viewers">
+				<span class="pulse"><span class="pulse__ring"></span><span class="pulse__dot"></span></span>
 				{viewerCount} spectateur{viewerCount > 1 ? 's' : ''}
 			</span>
 		{/if}
 	</div>
 
-	<div bind:this={scrollContainer} class="flex-1 space-y-4 overflow-y-auto px-4 py-4">
+	<div bind:this={scrollContainer} class="chat__messages">
 		{#each messages as msg (msg.id)}
-			<div class="flex items-start gap-2.5">
-				<Avatar class="size-6 shrink-0">
-					<AvatarImage src={msg.avatarUrl} alt={msg.username} />
-					<AvatarFallback class="text-xs">{msg.username[0]}</AvatarFallback>
-				</Avatar>
-				<p class="min-w-0 text-sm leading-snug">
-					<span class="font-semibold text-foreground">{msg.username}</span>
-					<span class="ml-1 text-foreground/80">{msg.content}</span>
+			<div class="message">
+				<div class="message__avatar">
+					{#if msg.avatarUrl}
+						<img src={msg.avatarUrl} alt={msg.username} />
+					{:else}
+						<span>{msg.username[0]?.toUpperCase()}</span>
+					{/if}
+				</div>
+				<p class="message__body">
+					<span class="message__author">{msg.username}</span>
+					<span class="message__content">{msg.content}</span>
 				</p>
 			</div>
 		{:else}
-			<div class="flex h-full items-center justify-center">
-				<p class="text-sm text-muted-foreground">Aucun message pour le moment.</p>
+			<div class="chat__empty">
+				<p>Aucun message pour le moment.</p>
 			</div>
 		{/each}
 	</div>
 
 	{#if onSend}
-		<form onsubmit={handleSubmit} class="flex items-center gap-2 border-t border-border p-3">
-			<Input bind:value={draft} {placeholder} {disabled} class="flex-1" />
-			<Button type="submit" size="icon" disabled={disabled || !draft.trim()}>
-				<SendIcon class="size-4" />
-			</Button>
+		<form onsubmit={handleSubmit} class="chat__form">
+			<input
+				bind:value={draft}
+				{placeholder}
+				{disabled}
+				class="chat__input"
+				type="text"
+			/>
+			<button type="submit" class="chat__send" disabled={disabled || !draft.trim()} aria-label="Envoyer">
+				<SendIcon size={15} strokeWidth={1.75} />
+			</button>
 		</form>
 	{/if}
 </div>
+
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+	.chat {
+		--bg: #ffffff;
+		--fg: #121210;
+		--muted: #77746c;
+		--border: #e6e3db;
+		--accent: #b23a1f;
+
+		display: flex;
+		width: 100%;
+		height: 100%;
+		flex-direction: column;
+		background: var(--bg);
+		border: 1px solid var(--border);
+		color: var(--fg);
+		font-family: 'Inter', sans-serif;
+	}
+
+	.chat__head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.85rem 1rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.chat__title {
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.chat__viewers {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.68rem;
+		color: var(--muted);
+	}
+
+	.pulse {
+		position: relative;
+		display: inline-flex;
+		width: 0.4rem;
+		height: 0.4rem;
+	}
+	.pulse__ring {
+		position: absolute;
+		inset: 0;
+		border-radius: 9999px;
+		background: var(--accent);
+		opacity: 0.6;
+		animation: pulse-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+	}
+	.pulse__dot {
+		position: relative;
+		display: block;
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 9999px;
+		background: var(--accent);
+	}
+	@keyframes pulse-ping {
+		75%, 100% { transform: scale(2.2); opacity: 0; }
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.pulse__ring { animation: none; }
+	}
+
+	/* Messages */
+	.chat__messages {
+		flex: 1;
+		overflow-y: auto;
+		padding: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+	}
+
+	.message {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.6rem;
+	}
+
+	.message__avatar {
+		flex-shrink: 0;
+		width: 1.5rem;
+		height: 1.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--border);
+		background: #f8f7f3;
+		overflow: hidden;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.6rem;
+		font-weight: 500;
+		color: var(--muted);
+	}
+	.message__avatar img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.message__body {
+		min-width: 0;
+		font-size: 0.85rem;
+		line-height: 1.5;
+	}
+	.message__author {
+		font-weight: 600;
+	}
+	.message__content {
+		margin-left: 0.3rem;
+		color: #3a382f;
+	}
+
+	.chat__empty {
+		display: flex;
+		height: 100%;
+		align-items: center;
+		justify-content: center;
+	}
+	.chat__empty p {
+		font-size: 0.82rem;
+		color: var(--muted);
+	}
+
+	/* Form */
+	.chat__form {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.75rem;
+		border-top: 1px solid var(--border);
+	}
+
+	.chat__input {
+		flex: 1;
+		min-width: 0;
+		padding: 0.55rem 0.75rem;
+		border: 1px solid var(--border);
+		background: var(--bg);
+		color: var(--fg);
+		font-family: 'Inter', sans-serif;
+		font-size: 0.85rem;
+	}
+	.chat__input:focus {
+		outline: none;
+		border-color: var(--fg);
+	}
+	.chat__input:disabled {
+		background: #f8f7f3;
+		color: var(--muted);
+	}
+
+	.chat__send {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 2.3rem;
+		height: 2.3rem;
+		border: 1px solid var(--fg);
+		background: var(--fg);
+		color: #fff;
+		cursor: pointer;
+		transition: opacity 0.2s ease;
+	}
+	.chat__send:hover:not(:disabled) {
+		opacity: 0.8;
+	}
+	.chat__send:disabled {
+		border-color: var(--border);
+		background: var(--border);
+		color: var(--muted);
+		cursor: not-allowed;
+	}
+</style>

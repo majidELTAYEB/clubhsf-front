@@ -65,21 +65,15 @@
 					</div>
 				</DropdownMenu.Label>
 				<DropdownMenu.Separator />
-				<DropdownMenu.Group>
-					<DropdownMenu.Item>
-						<SparklesIcon />
-						Upgrade to Pro
-					</DropdownMenu.Item>
-				</DropdownMenu.Group>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Group>
 					<DropdownMenu.Item>
 						<BadgeCheckIcon />
-						Account
+						Compte
 					</DropdownMenu.Item>
 					<DropdownMenu.Item>
 						<CreditCardIcon />
-						Billing
+						Facturation
 					</DropdownMenu.Item>
 					<DropdownMenu.Item>
 						<BellIcon />
@@ -87,10 +81,14 @@
 					</DropdownMenu.Item>
 				</DropdownMenu.Group>
 				<DropdownMenu.Separator />
-				<DropdownMenu.Item>
-					<LogOutIcon />
-					Log out
-				</DropdownMenu.Item>
+<DropdownMenu.Item>
+	{#snippet child({ props })}
+		<a href="/auth/logout" {...props}>
+			<LogOutIcon />
+			Deconnexion
+		</a>
+	{/snippet}
+</DropdownMenu.Item>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</Sidebar.MenuItem>

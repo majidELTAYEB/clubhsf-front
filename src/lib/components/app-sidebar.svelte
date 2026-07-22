@@ -5,12 +5,13 @@
 	import Tv from "@lucide/svelte/icons/tv";
 	import Clapperboard from "@lucide/svelte/icons/clapperboard";
 	import Videotape from "@lucide/svelte/icons/videotape";
+	import { authState } from "$lib/features/auth/store.svelte";
 
 	const data = {
 		user: {
-			name: "shadcn",
-			email: "m@example.com",
-			avatar: "/avatars/shadcn.jpg",
+			name: authState.user?.name || "",
+			email: authState.user?.email || "",
+			avatar: authState.user?.picture || "/avatars/shadcn.jpg",
 		},
 		navMain: [
 			{
@@ -104,7 +105,9 @@
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<NavMain items={data.navMain} />
-		<NavProjects projects={data.admin} />
+		{#if authState.user?.role === 'admin'}
+			<NavProjects projects={data.admin} />
+		{/if}
 		<NavSecondary items={data.navSecondary} class="mt-auto" />
 	</Sidebar.Content>
 	<Sidebar.Footer>

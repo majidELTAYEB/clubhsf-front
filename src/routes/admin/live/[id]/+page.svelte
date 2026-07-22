@@ -183,7 +183,7 @@ const currentViewerId = "admin-" + crypto.randomUUID().slice(0, 8);
 
 function connectChatSocket() {
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-    const wsUrl = `${protocol}://localhost:8081/ws/telemetry`;
+    const wsUrl = `${protocol}://localhost:8080/ws/telemetry`;
     
     chatSocket = new WebSocket(wsUrl);
 

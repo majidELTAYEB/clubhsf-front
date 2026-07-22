@@ -2,7 +2,7 @@
 type ChatMessage = { id: string; username: string; content: string };
 type RawChatMessage = { viewerId: string; content: string };
 
-const WS_BASE = 'ws://localhost:8081';
+const WS_BASE = 'ws://localhost:8080';
 
 function labelFor(viewerId: string) {
 	return viewerId;

@@ -1,10 +1,20 @@
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
+import { error } from '@sveltejs/kit';
 
-const BACKEND_URL = env.BACKEND_URL ?? 'http://localhost:8081';
+const BACKEND_URL = env.BACKEND_URL ?? 'http://localhost:8080';
 
 const handle: RequestHandler = async ({ request, params, locals, url }) => {
   if (!locals.accessToken) return new Response('Non authentifié', { status: 401 });
+
+  // 🔒 Blocage premium sur les endpoints sensibles (adapte la liste des préfixes à ton besoin)
+  const premiumOnlyPrefixes = ['videos', 'masterclass', 'lives', 'collections'];
+  const isPremiumOnly = premiumOnlyPrefixes.some((p) => params.path?.startsWith(p));
+  const isAdmin = locals.user?.role === 'admin';
+
+  if (isPremiumOnly && !locals.user?.isPremium && !isAdmin) {
+    error(403, 'Abonnement premium requis');
+  }
 
   const target = `${BACKEND_URL}/${params.path}${url.search}`;
   const headers = new Headers(request.headers);

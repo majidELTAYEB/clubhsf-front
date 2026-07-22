@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -31,7 +31,6 @@
 		"@types/d3-shape": "^3.1.8",
 		"@types/node": "^22",
 		"@types/tus-js-client": "^2.1.0",
-		"@types/video.js": "^7.3.58",
 		"bits-ui": "^2.18.1",
 		"clsx": "^2.1.1",
 		"d3-scale": "^4.0.2",
@@ -60,10 +59,12 @@
 	"dependencies": {
 		"@auth0/auth0-spa-js": "^2.23.0",
 		"@mux/mux-player": "^3.13.0",
+		"@types/video.js": "^7.3.58",
 		"jose": "^6.2.3",
 		"jwt-decode": "^4.0.0",
 		"layerchart": "^2.0.1",
 		"mode-watcher": "^1.1.0",
+		"stripe": "^22.3.2",
 		"svelte-dnd-action": "^0.9.74",
 		"tus-js-client": "^4.3.1",
 		"video.js": "^8.23.9"

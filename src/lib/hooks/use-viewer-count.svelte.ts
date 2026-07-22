@@ -1,6 +1,6 @@
 import { getViewerCount } from "$lib/features/live/api";
 
-const API_BASE = 'http://localhost:8081';
+const API_BASE = 'http://localhost:8080';
 
 export function useViewerCount(streamId: string) {
 	let count = $state(0);

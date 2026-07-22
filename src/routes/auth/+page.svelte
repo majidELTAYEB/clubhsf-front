@@ -1,6 +1,6 @@
 
 <script lang="ts">
-	import { authState } from '$lib/features/auth/store';
+	import { authState } from '$lib/features/auth/store.svelte';
 	import { getMe } from '$lib/features/auth/api';
 	import { goto } from '$app/navigation';
     import { resolve } from '$app/paths';
@@ -9,8 +9,8 @@
 	let lastResult: string | null = $state(null);
 
     $effect(() => {
-		if ($authState.isAuthenticated) {
-			goto(resolve('/home'));
+		if (authState.isAuthenticated) {
+			goto(resolve('/masterclass'));
             
 		}
 	});
@@ -40,10 +40,10 @@
 			<h1>Espace compte</h1>
 		</header>
 
-		{#if $authState.isAuthenticated}
+		{#if authState.isAuthenticated}
 			<div class="status status--on">
 				<span class="dot"></span>
-				<p>Connecté : <strong>{$authState.user?.email}</strong></p>
+				<p>Connecté : <strong>{authState.user?.email}</strong></p>
 			</div>
 			<a class="btn btn--ghost" href={resolve('/auth/logout')}>Se déconnecter</a>
 		{:else}

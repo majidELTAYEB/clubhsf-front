@@ -1,6 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { AUTH0_TOKEN_URL, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } from '$lib/config/auth0.config';
-import type { AuthUser, TokenSet } from '$lib/features/auth/types';
+import type { AuthUser, TokenSet, UserProfile } from '$lib/features/auth/types';
 
 function decodeJwt<T>(token: string): T {
   const payload = token.split('.')[1];
@@ -40,12 +40,10 @@ export const handle: Handle = async ({ event, resolve }) => {
         event.cookies.set('id_token', tokens.id_token, { ...secureCookie, maxAge: tokens.expires_in });
       }
 
-      // ✅ Sauvegarde le nouveau refresh_token si Auth0 en a émis un (rotation activée)
       if (tokens.refresh_token) {
         event.cookies.set('refresh_token', tokens.refresh_token, { ...secureCookie, maxAge: 60 * 60 * 24 * 30 });
       }
     } else {
-      // ❌ Le refresh a échoué (token révoqué, expiré, ou rotation cassée) → on nettoie tout
       event.cookies.delete('access_token', { path: '/' });
       event.cookies.delete('id_token', { path: '/' });
       event.cookies.delete('refresh_token', { path: '/' });
@@ -61,18 +59,46 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
   }
 
+  const profileCookie = event.cookies.get('user_profile');
+  if (user && profileCookie) {
+    try {
+      const profile: UserProfile = JSON.parse(profileCookie);
+      user = {
+        ...user,
+        role: profile.role,
+        isPremium: profile.is_premium
+      };
+    } catch {
+      // cookie corrompu, on ignore silencieusement
+    }
+  }
+
   event.locals.user = user;
   event.locals.accessToken = accessToken ?? null;
 
-const publicRoutes = ['/', '/auth/login', '/auth/callback', '/auth/logout', '/auth'];
-const isPublicRoute = publicRoutes.includes(event.url.pathname) || event.url.pathname.startsWith('/api/');
+  // Routes accessibles sans être connecté
+  const publicRoutes = ['/', '/auth/login', '/auth/callback', '/auth/logout', '/auth'];
+  const isPublicRoute = publicRoutes.includes(event.url.pathname) || event.url.pathname.startsWith('/api/');
 
-if (!isPublicRoute && !event.locals.user) {
-  return new Response(null, {
-    status: 302,
-    headers: { location: `/auth/login?redirectTo=${event.url.pathname}` }
-  });
-}
+  if (!isPublicRoute && !event.locals.user) {
+    return new Response(null, {
+      status: 302,
+      headers: { location: `/auth/login?redirectTo=${event.url.pathname}` }
+    });
+  }
+
+  // 🔒 Routes accessibles même sans premium (page de paiement + tout ce qui doit rester visible)
+  // 👉 AJUSTE "/premium" ci-dessous avec ta vraie route de paiement
+  const premiumExemptRoutes = ['/premium'];
+  const isPremiumExempt = isPublicRoute || premiumExemptRoutes.includes(event.url.pathname);
+  const isAdmin = event.locals.user?.role === 'admin';
+
+  if (!isPremiumExempt && event.locals.user && !event.locals.user.isPremium && !isAdmin) {
+    return new Response(null, {
+      status: 302,
+      headers: { location: '/premium' }
+    });
+  }
 
   return resolve(event);
 };
