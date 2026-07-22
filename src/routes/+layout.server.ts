@@ -3,7 +3,7 @@ import type { LayoutServerLoad } from './$types';
 
 // Routes accessibles même sans être premium — la page de paiement elle-même,
 // sa page de retour Stripe, et tout le flow d'auth (sinon on bloquerait le login).
-const ALLOWED_WITHOUT_PREMIUM = ['/premium', '/auth', '/billing/cancel'];
+const ALLOWED_WITHOUT_PREMIUM = ['/premium', '/auth', '/billing/cancel', '/billing/success'];
 
 function isAllowed(pathname: string): boolean {
 	return ALLOWED_WITHOUT_PREMIUM.some(

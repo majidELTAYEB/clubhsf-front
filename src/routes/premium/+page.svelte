@@ -1,4 +1,3 @@
-<!-- src/routes/premium/+page.svelte -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
@@ -24,7 +23,7 @@
 
 <div class="archive">
 	<div class="masthead">
-		<a href="/home" class="back-link">
+		<a href="/masterclass" class="back-link">
 			<ArrowLeftIcon size={13} strokeWidth={1.75} />
 			<span>Retour</span>
 		</a>
