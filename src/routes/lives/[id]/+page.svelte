@@ -50,15 +50,16 @@
 
 	const viewerCount = useViewerCount(live.id);
 
-	onMount(() => {
+	$effect(() => {
+	if (isLive) {
 		chat.connect();
 		viewerCount.start();
-
-		return () => {
-			chat.disconnect();
-			viewerCount.stop();
-		};
-	});
+	}
+	return () => {
+		chat.disconnect();
+		viewerCount.stop();
+	};
+});
 </script>
 
 {#snippet credentialField(label: string, value: string, field: string)}
