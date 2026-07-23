@@ -39,6 +39,7 @@
         collectionTitle,
     }: { open?: boolean; collectionId?: string; collectionTitle?: string } = $props();
 
+
     const isDesktop = new MediaQuery("(min-width: 768px)");
     const id = $props.id();
 

@@ -228,21 +228,22 @@
         if (title === "") return;
         isCreating = true;
         try {
-            const newCollection = await createCollection({ title });
+            const result = await createCollection({ title });
+            const newCollection = result.data
             data = [newCollection, ...data];
             isCreateDialogOpen = false;
             newTitle = "";
             toast.success(`"${newCollection.title}" créée`);
             goto(`/admin/collections/${newCollection.id}`);
         } catch (err) {
-            toast.error("Impossible de créer la formation");
+            toast.error("Impossible de créer la collection");
         } finally {
             isCreating = false;
         }
     }
 </script>
 
-<Tabs.Root value="all" class="w-full flex-col justify-start gap-6">
+<Tabs.Root value="all" class="w-full flex-col justify-start gap-6 py-4">
     <div class="flex items-center justify-between px-4 lg:px-6">
         <Label for="view-selector" class="sr-only">Vue</Label>
         <Select.Root type="single" bind:value={view}>

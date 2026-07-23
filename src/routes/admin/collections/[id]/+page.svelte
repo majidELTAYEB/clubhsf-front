@@ -24,6 +24,10 @@
     import { Badge } from "$lib/components/ui/badge";
     import { ScrollArea } from "$lib/components/ui/scroll-area";
     import * as Item from "$lib/components/ui/item/index.js";
+    import ImageOffIcon from "@lucide/svelte/icons/image-off";
+    	import LoaderIcon from "@lucide/svelte/icons/loader";
+	import CheckIcon from "@lucide/svelte/icons/check";
+	import TriangleAlertIcon from "@lucide/svelte/icons/triangle-alert";
 
     // ⚠️ Adapte le chemin d'import selon ton projet
     // import {
@@ -214,6 +218,23 @@
             isDeleting = false;
         }
     }
+
+    	let brokenThumbs = $state(new Set<string>());
+ 
+	function handleThumbError(videoId: string) {
+		brokenThumbs.add(videoId);
+		brokenThumbs = brokenThumbs; // force la réactivité sur un Set muté
+	}
+
+    	const statusConfig: Record<string, { label: string; icon: typeof CheckIcon; class: string }> = {
+		ready: { label: "Prêt", icon: CheckIcon, class: "text-emerald-600" },
+		processing: { label: "En traitement", icon: LoaderIcon, class: "text-amber-600" },
+		queued: { label: "En attente", icon: LoaderIcon, class: "text-muted-foreground" },
+		failed: { label: "Échec", icon: TriangleAlertIcon, class: "text-destructive" },
+	};
+    	function getStatus(status: string | undefined) {
+		return statusConfig[status ?? ''] ?? { label: status ?? 'Inconnu', icon: TriangleAlertIcon, class: "text-muted-foreground" };
+	}
 </script>
 
 <div class="container mx-auto max-w-6xl py-10 space-y-6 pb-28">
@@ -364,35 +385,38 @@
                                 </Button>
                             </Empty.Root>
                         {:else}
-                            <ScrollArea class="max-h-[500px] pr-3">
-                                <div class="space-y-2">
-                                    {#each videos as video (video.video_id)}
-                                        <Item.Root variant="outline">
-                                            <Item.Media variant="image">
-                                                <img
-                                                    src={video.thumbnail_url}
-                                                    alt={video.title}
-                                                    width="32"
-                                                    height="32"
-                                                    class="size-8 rounded object-cover"
-                                                />
-                                            </Item.Media>
-                                            <Item.Content>
-                                                <Item.Title class="line-clamp-1">{video.title}</Item.Title>
-                                            </Item.Content>
-                                            <!-- <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                class="size-7"
-                                                onclick={() => openEditVideoDialog(video)}
-                                            >
-                                                <PencilIcon class="size-3.5" />
-                                                <span class="sr-only">Modifier les infos de la vidéo</span>
-                                            </Button> -->
-                                        </Item.Root>
-                                    {/each}
-                                </div>
-                            </ScrollArea>
+<ScrollArea class="max-h-[500px] pr-3">
+	<div class="space-y-2">
+		{#each videos as video (video.video_id)}
+			{@const status = getStatus(video.status)}
+			<Item.Root variant="outline">
+				<Item.Media variant="image">
+					{#if video.thumbnail_url && !brokenThumbs.has(video.video_id)}
+						<img
+							src={video.thumbnail_url}
+							alt={video.title}
+							width="32"
+							height="32"
+							class="size-8 rounded object-cover"
+							onerror={() => handleThumbError(video.video_id)}
+						/>
+					{:else}
+						<div class="flex size-8 items-center justify-center rounded bg-muted">
+							<ImageOffIcon class="size-3.5 text-muted-foreground" />
+						</div>
+					{/if}
+				</Item.Media>
+				<Item.Content>
+					<Item.Title class="line-clamp-1">{video.title}</Item.Title>
+					<div class="flex items-center gap-1 text-xs {status.class}">
+						<status.icon class="size-3 {video.status === 'processing' || video.status === 'queued' ? 'animate-spin' : ''}" />
+						<span>{status.label}</span>
+					</div>
+				</Item.Content>
+			</Item.Root>
+		{/each}
+	</div>
+</ScrollArea>
                         {/if}
                     </CardContent>
                 </Card>
