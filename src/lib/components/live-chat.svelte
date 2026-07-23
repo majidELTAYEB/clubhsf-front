@@ -4,7 +4,7 @@
 
 	type Message = {
 		id: string;
-		username: string;
+		viewerId: string;
 		content: string;
 		avatarUrl?: string;
 	};
@@ -55,13 +55,13 @@
 			<div class="message">
 				<div class="message__avatar">
 					{#if msg.avatarUrl}
-						<img src={msg.avatarUrl} alt={msg.username} />
+						<img src={msg.avatarUrl} alt={msg.viewerId} />
 					{:else}
-						<span>{msg.username[0]?.toUpperCase()}</span>
+						<span>{msg.viewerId?.[0]?.toUpperCase()}</span>
 					{/if}
 				</div>
 				<p class="message__body">
-					<span class="message__author">{msg.username}</span>
+					<span class="message__author">{msg.viewerId}</span>
 					<span class="message__content">{msg.content}</span>
 				</p>
 			</div>

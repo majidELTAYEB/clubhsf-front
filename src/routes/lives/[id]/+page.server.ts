@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, fetch, locals }) => {
 	const res = await fetch(`/api/livestreams/${params.id}`);
 
 	if (res.status === 404) {
@@ -15,5 +15,5 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
 	const chatRes = await fetch(`/api/telemetry/${params.id}/chat`);
 	const chatHistory = chatRes.ok ? (await chatRes.json()).messages : [];
-	return { live, chatHistory };
+	return { live, chatHistory, wsToken: locals.accessToken };
 };

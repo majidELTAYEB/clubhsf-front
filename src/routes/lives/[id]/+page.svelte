@@ -1,4 +1,4 @@
-<!-- src/routes/lives/[id]/+page.svelte -->
+src/routes/lives/[id]/+page.svelte
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
@@ -46,8 +46,7 @@
 		return 'Terminé';
 	}
 
-	const userName = 'majid';
-	const chat = useLiveChat(live.id, userName);
+	const chat = useLiveChat(live.id, data.wsToken ?? '');
 	chat.setHistory(data.chatHistory);
 
 	const viewerCount = useViewerCount(live.id);

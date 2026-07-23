@@ -1,6 +1,5 @@
 import { getViewerCount } from "$lib/features/live/api";
 
-const API_BASE = 'http://localhost:8080';
 
 export function useViewerCount(streamId: string) {
 	let count = $state(0);
@@ -9,7 +8,7 @@ export function useViewerCount(streamId: string) {
 
 	async function start(intervalMs = 10000) {
 		const data = await getViewerCount(streamId);
-    count = data.viewers ?? 0;
+    	count = data.viewers ?? 0;
 
     // 2. Configuration de l'intervalle avec une fonction fléchée (arrow function)
     interval = setInterval(async () => {

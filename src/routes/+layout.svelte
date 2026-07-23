@@ -19,10 +19,10 @@
 	let hasFullAccess = $derived(data.user?.hasFullAccess === true);
 </script>
 
-<ModeWatcher defaultMode="light" />
+<!-- <ModeWatcher defaultMode="light" /> -->
 
 {#if isAuthenticated}
-	<Toaster position="top-center" richColors theme="dark" />
+	<Toaster position="top-center" richColors/>
 
 	{#if hasFullAccess}
 		<Sidebar.Provider open={data.sidebarOpen} isMobileGuess={data.isMobileGuess}>
