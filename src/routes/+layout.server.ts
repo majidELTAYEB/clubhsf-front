@@ -1,8 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
-// Routes accessibles même sans être premium — la page de paiement elle-même,
-// sa page de retour Stripe, et tout le flow d'auth (sinon on bloquerait le login).
 const ALLOWED_WITHOUT_PREMIUM = ['/premium', '/auth', '/billing/cancel', '/billing/success'];
 
 function isAllowed(pathname: string): boolean {
@@ -11,14 +9,17 @@ function isAllowed(pathname: string): boolean {
 	);
 }
 
-export const load: LayoutServerLoad = async ({ cookies, url }) => {
-	const rawProfile = cookies.get('user_profile');
-	const profile = rawProfile ? JSON.parse(rawProfile) : null;
-
-	// Pas connecté : le layout auth existant s'en occupe déjà, on ne touche à rien ici.
-	if (profile && !profile.is_premium && !isAllowed(url.pathname)) {
+export const load: LayoutServerLoad = async ({ locals, url }) => {
+	// `locals.user` est déjà peuplé par hooks.server.ts (décodage id_token +
+	// fusion avec le cookie user_profile) — on ne relit plus le cookie ici
+	// en double, une seule source de vérité.
+	if (locals.user && !locals.user.isPremium && !isAllowed(url.pathname)) {
 		throw redirect(303, '/premium');
 	}
 
-	return { user: profile };
+	return {
+		user: locals.user,
+		sidebarOpen: locals.sidebarOpen ?? true, // si tu as branché le fix du flash sidebar
+		isMobileGuess: locals.isMobileGuess ?? false
+	};
 };
