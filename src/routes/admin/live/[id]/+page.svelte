@@ -49,7 +49,6 @@
 		}
 	}
 
-	// Viewers : polling REST simple, aucun heartbeat envoyé depuis l'admin
 	let viewerCount = $state<number | null>(null);
 	let viewerInterval: ReturnType<typeof setInterval>;
 
@@ -125,18 +124,19 @@
 	}
 
 	onMount(() => {
+	if (isLive) {
 		fetchViewerCount();
 		fetchChatHistory();
 		connectChatSocket();
-
 		viewerInterval = setInterval(fetchViewerCount, 10000);
+	}
 
-		return () => {
-			clearInterval(viewerInterval);
-			clearInterval(heartbeatInterval);
-			chatSocket?.close();
-		};
-	});
+	return () => {
+		clearInterval(viewerInterval);
+		clearInterval(heartbeatInterval);
+		chatSocket?.close();
+	};
+});
 </script>
 
 {#snippet credentialField(label: string, value: string, field: string)}
