@@ -91,22 +91,24 @@
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
-	.chat {
-		--bg: #ffffff;
-		--fg: #121210;
-		--muted: #77746c;
-		--border: #e6e3db;
-		--accent: #b23a1f;
+.chat {
+	--bg: #ffffff;
+	--fg: #121210;
+	--muted: #77746c;
+	--border: #e6e3db;
+	--accent: #b23a1f;
 
-		display: flex;
-		width: 100%;
-		height: 100%;
-		flex-direction: column;
-		background: var(--bg);
-		border: 1px solid var(--border);
-		color: var(--fg);
-		font-family: 'Inter', sans-serif;
-	}
+	display: flex;
+	width: 100%;
+	height: 100%;
+	max-height: 600px; /* borne dure, indépendante des parents */
+	flex-direction: column;
+	background: var(--bg);
+	border: 1px solid var(--border);
+	color: var(--fg);
+	font-family: 'Inter', sans-serif;
+	overflow: hidden; /* empêche .chat lui-même de grandir */
+}
 
 	.chat__head {
 		display: flex;
@@ -165,6 +167,7 @@
 	.chat__messages {
 		flex: 1;
 		overflow-y: auto;
+		min-height: 0;
 		padding: 1rem;
 		display: flex;
 		flex-direction: column;

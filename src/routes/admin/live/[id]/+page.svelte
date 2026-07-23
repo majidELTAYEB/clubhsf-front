@@ -207,7 +207,7 @@
 			<LivePlayer playbackId={liveStream.playback_id} title={live.title} />
 		</div>
 
-		<div class="flex w-full shrink-0 lg:w-[340px]">
+		<div class="flex h-[600px] w-full shrink-0 lg:h-auto lg:w-[340px]">
 			<LiveChat messages={chatMessages} viewerCount={viewerCount ?? undefined} />
 		</div>
 	</div>

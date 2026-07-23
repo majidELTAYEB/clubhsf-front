@@ -1,4 +1,3 @@
-src/routes/lives/[id]/+page.svelte
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
@@ -243,7 +242,7 @@ src/routes/lives/[id]/+page.svelte
 	}
 
 	.archive__inner {
-		max-width: 1180px;
+		max-width: 1480px;
 		margin: 0 auto;
 		padding: 2rem 1.5rem 6rem;
 	}
@@ -258,6 +257,7 @@ src/routes/lives/[id]/+page.svelte
 		.stage {
 			flex-direction: row;
 			align-items: stretch;
+			height: 100%;
 		}
 	}
 
@@ -271,13 +271,12 @@ src/routes/lives/[id]/+page.svelte
 		flex-shrink: 0;
 	}
 	@media (min-width: 1024px) {
-		.stage__chat { width: 340px; }
+		.stage__chat { width: 340px; height: 100%; }
 	}
 
 	.player-frame {
 		height: 100%;
 		overflow: hidden;
-		border: 1px solid var(--border);
 	}
 
 	/* Heading */
