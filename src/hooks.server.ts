@@ -105,6 +105,16 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
   }
 
+  // 🎯 Source unique de vérité pour "cet utilisateur a accès au contenu premium"
+  // (premium payant OU admin). Tout le reste de l'app (layout, +page.server.ts,
+  // etc.) doit lire ce champ plutôt que de recalculer isPremium || role === 'admin'.
+  if (user) {
+    user = {
+      ...user,
+      hasFullAccess: user.isPremium === true || user.role === 'admin'
+    };
+  }
+
   event.locals.user = user;
   event.locals.accessToken = accessToken ?? null;
 
@@ -123,9 +133,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   const premiumExemptPrefixes = ['/premium', '/auth', '/billing/success', '/billing/cancel'];
   const isPremiumExempt = isPublicRoute || premiumExemptPrefixes.some((p) => pathname.startsWith(p));
-  const isAdmin = event.locals.user?.role === 'admin';
 
-  if (!isPremiumExempt && event.locals.user && !event.locals.user.isPremium && !isAdmin) {
+  if (!isPremiumExempt && event.locals.user && !event.locals.user.hasFullAccess) {
     return new Response(null, {
       status: 302,
       headers: { location: '/premium' }

@@ -16,6 +16,7 @@ export interface AuthUser {
   picture?: string;
   role?: string;
   isPremium?: boolean;
+  hasFullAccess: boolean;
 }
 
 export interface UserProfile {

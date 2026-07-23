@@ -16,7 +16,7 @@
 	// (donc de `locals.user`, scopé par requête). Sûr en SSR concurrent, aucun
 	// flash puisque disponible dès le tout premier rendu, serveur ou client.
 	let isAuthenticated = $derived(data.user !== null);
-	let isPremium = $derived(data.user?.isPremium === true);
+	let hasFullAccess = $derived(data.user?.hasFullAccess === true);
 </script>
 
 <ModeWatcher defaultMode="light" />
@@ -24,7 +24,7 @@
 {#if isAuthenticated}
 	<Toaster position="top-center" richColors theme="dark" />
 
-	{#if isPremium}
+	{#if hasFullAccess}
 		<Sidebar.Provider open={data.sidebarOpen} isMobileGuess={data.isMobileGuess}>
 			<AppSidebar />
 			<Sidebar.Inset>

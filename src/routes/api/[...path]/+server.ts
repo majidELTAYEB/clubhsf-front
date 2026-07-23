@@ -10,9 +10,8 @@ const handle: RequestHandler = async ({ request, params, locals, url }) => {
   // 🔒 Blocage premium sur les endpoints sensibles (adapte la liste des préfixes à ton besoin)
   const premiumOnlyPrefixes = ['videos', 'masterclass', 'lives', 'collections'];
   const isPremiumOnly = premiumOnlyPrefixes.some((p) => params.path?.startsWith(p));
-  const isAdmin = locals.user?.role === 'admin';
 
-  if (isPremiumOnly && !locals.user?.isPremium && !isAdmin) {
+  if (isPremiumOnly && !locals.user?.hasFullAccess) {
     error(403, 'Abonnement premium requis');
   }
 
