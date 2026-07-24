@@ -3,6 +3,7 @@
 	import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
 	import CheckIcon from "@lucide/svelte/icons/check";
 	import LockIcon from "@lucide/svelte/icons/lock";
+	import LogOutIcon from "@lucide/svelte/icons/log-out";
 
 	let { form }: { form?: { error?: string } } = $props();
 
@@ -28,6 +29,10 @@
 			<span>Retour</span>
 		</a>
 		<span class="masthead__eyebrow">Premium</span>
+		<a href="/auth/logout" class="logout-link">
+			<LogOutIcon size={13} strokeWidth={1.75} />
+			<span>Déconnexion</span>
+		</a>
 	</div>
 
 	<div class="archive__inner">
@@ -117,7 +122,8 @@
 		border-bottom: 1px solid var(--border);
 	}
 
-	.back-link {
+	.back-link,
+	.logout-link {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.45rem;
@@ -129,7 +135,12 @@
 		text-transform: uppercase;
 		transition: opacity 0.2s ease;
 	}
-	.back-link:hover { opacity: 0.55; }
+	.back-link:hover,
+	.logout-link:hover { opacity: 0.55; }
+
+	.logout-link {
+		color: var(--muted);
+	}
 
 	.masthead__eyebrow {
 		margin-left: auto;
