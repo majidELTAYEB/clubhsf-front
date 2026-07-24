@@ -71,7 +71,7 @@
 		{:else}
 			<div class="video-grid">
 				{#each data.videos as video (video.ID)}
-					<a href={`/video/${video.ID}`} class="video-card">
+					<a href={`/video/${video.ID}?collection=${data.collection.id}`} class="video-card">
 						{#if video.ThumbnailURL}
 							<img class="video-card__img" src={video.ThumbnailURL} alt={video.Title} loading="lazy" />
 						{/if}

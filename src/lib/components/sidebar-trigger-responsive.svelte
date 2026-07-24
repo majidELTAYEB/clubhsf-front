@@ -10,7 +10,7 @@
 	on masque juste SON icône et on affiche la nôtre par-dessus, en pointer-events: none,
 	pour ne pas gêner le clic.
 -->
-<div class="sidebar-trigger-wrap">
+<div class="sidebar-trigger-wrap cursor-pointer">
 	<Sidebar.Trigger class="sidebar-trigger-wrap__hit" />
 	<span class="sidebar-trigger-wrap__icons" aria-hidden="true">
 		<MenuIcon class="sidebar-trigger-wrap__icon sidebar-trigger-wrap__icon--mobile" size={18} strokeWidth={1.75} />

@@ -1,17 +1,47 @@
 <script lang="ts">
     import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
     import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
+    import videojs from 'video.js';
+    import 'video.js/dist/video-js.css';
+    import { onMount, onDestroy } from 'svelte';
 
     let { data } = $props();
-    let video = $derived(data.videos);
+    let video = $derived(data.video);
+    let nextVideo = $derived(data.nextVideo);
 
-    // Données fictives pour la navigation
-    const nextVideo = {
-        title: "Construire un système infaillible : Comment ne plus dépendre de sa motivation",
-        slug: "lacrim-interview",
-        category: "Interview",
-        thumbnail: "https://pub-e96ca58f901f4cd682430289791be1ec.r2.dev/image/Capture%20d%E2%80%99e%CC%81cran%202026-07-21%20a%CC%80%2019.06.56.png"
-    };
+    let videoEl: HTMLVideoElement;
+    let player: ReturnType<typeof videojs>;
+
+    // Dérive le domaine de la pull zone à partir de ThumbnailURL
+    let pullZoneHost = $derived(
+        video?.ThumbnailURL ? new URL(video.ThumbnailURL).hostname : ''
+    );
+
+    let hlsUrl = $derived(
+        pullZoneHost && video?.BunnyVideoID
+            ? `https://${pullZoneHost}/${video.BunnyVideoID}/playlist.m3u8`
+            : ''
+    );
+
+    onMount(() => {
+        if (hlsUrl) {
+            player = videojs(videoEl, {
+                controls: true,
+                fluid: false,
+                responsive: true,
+                preload: 'metadata',
+                poster: video.ThumbnailURL,
+                sources: [{
+                    src: hlsUrl,
+                    type: 'application/x-mpegURL'
+                }]
+            });
+        }
+    });
+
+    onDestroy(() => {
+        player?.dispose();
+    });
 
     // Numéro de catalogue — dérivé de l'ID, façon "N° 0142"
     let catalogNumber = $derived(
@@ -43,8 +73,12 @@
     <div class="archive__inner">
         <!-- Photo — pas de lecteur, juste la miniature -->
         <div class="player-frame">
-            <img class="cover-img" src={video.ThumbnailURL} alt={video.Title} />
-        </div>
+    {#if hlsUrl}
+        <video bind:this={videoEl} class="video-js vjs-big-play-centered"></video>
+    {:else}
+        <img class="cover-img" src={video.ThumbnailURL} alt={video.Title} />
+    {/if}
+</div>
 
         <!-- Titre + byline -->
         <div class="heading">
@@ -64,7 +98,7 @@
                 </p>
             </div>
 
-            <aside class="archive__aside">
+            <!-- <aside class="archive__aside">
                 <span class="eyebrow">Ensuite</span>
                 <a href="/videos/{nextVideo.slug}" class="next-entry">
                     <div class="next-entry__thumb">
@@ -76,7 +110,22 @@
                         <span class="next-entry__cta">Regarder <ArrowRightIcon size={12} strokeWidth={1.75} /></span>
                     </div>
                 </a>
-            </aside>
+            </aside> -->
+
+            {#if nextVideo}
+<aside class="archive__aside">
+    <span class="eyebrow">Ensuite</span>
+    <a href="/video/{nextVideo.video_id}?collection={data.collectionId}" class="next-entry">
+        <div class="next-entry__thumb">
+            <img src={nextVideo.thumbnail_url} alt={nextVideo.title} />
+        </div>
+        <div class="next-entry__text">
+            <span class="next-entry__title">{nextVideo.title}</span>
+            <span class="next-entry__cta">Regarder <ArrowRightIcon size={12} strokeWidth={1.75} /></span>
+        </div>
+    </a>
+</aside>
+{/if}
         </div>
     </div>
 </div>
@@ -280,4 +329,9 @@
         text-transform: uppercase;
         color: var(--accent);
     }
+
+    .player-frame :global(.video-js) {
+    width: 100%;
+    height: 100%;
+}
 </style>

@@ -1,12 +1,14 @@
 <script lang="ts" module>
 	import LifeBuoyIcon from "@lucide/svelte/icons/life-buoy";
-	import Tv from "@lucide/svelte/icons/tv";
+	import Signal from "@lucide/svelte/icons/signal";
+	import Webcam from "@lucide/svelte/icons/webcam";
+	import Library from "@lucide/svelte/icons/library";
 	import Clapperboard from "@lucide/svelte/icons/clapperboard";
 	import Videotape from "@lucide/svelte/icons/videotape";
 
 	const navMain = [
 		{ title: "Masterclass", url: "/masterclass", icon: Clapperboard, isActive: true },
-		{ title: "Live", url: "/lives", icon: Tv, isActive: true },
+		{ title: "Live", url: "/lives", icon: Webcam, isActive: true },
 		{ title: "Replay Live", url: "#", icon: Videotape, isActive: true },
 	];
 
@@ -15,8 +17,8 @@
 	];
 
 	const admin = [
-		{ name: "Configuration Live", url: "/admin/lives", icon: Tv },
-		{ name: "Configuration Collections", url: "/admin/collections", icon: Tv },
+		{ name: "Configuration Live", url: "/admin/lives", icon: Signal },
+		{ name: "Configuration Collections", url: "/admin/collections", icon: Library },
 	];
 </script>
 
@@ -64,7 +66,7 @@
 			{#if page.data.user?.role === 'admin'}
 				<NavProjects projects={admin} />
 			{/if}
-			<NavSecondary items={navSecondary} class="mt-auto" />
+			<!-- <NavSecondary items={navSecondary} class="mt-auto" /> -->
 		</Sidebar.Content>
 		<Sidebar.Footer>
 			<NavUser {user} />
