@@ -4,6 +4,19 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
+
+# Valeurs factices pour satisfaire la validation au build — écrasées au runtime par le vrai .env
+ENV AUTH0_DOMAIN=build-placeholder.auth0.com
+ENV AUTH0_CLIENT_ID=build-placeholder
+ENV AUTH0_CLIENT_SECRET=build-placeholder
+ENV AUTH0_AUDIENCE=build-placeholder
+ENV AUTH0_M2M_CLIENT_ID=build-placeholder
+ENV AUTH0_M2M_CLIENT_SECRET=build-placeholder
+ENV PUBLIC_APP_URL=http://localhost:3000
+ENV STRIPE_SECRET_KEY=sk_placeholder
+ENV STRIPE_PRICE_MONTHLY=price_placeholder
+ENV STRIPE_PRICE_YEARLY=price_placeholder
+
 RUN pnpm run build
 
 FROM node:22-alpine
