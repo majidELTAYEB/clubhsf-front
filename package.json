@@ -15,8 +15,8 @@
 	},
 	"devDependencies": {
 		"@dnd-kit-svelte/svelte": "^0.1.6",
-		"@dnd-kit/abstract": "^0.1.21",
-		"@dnd-kit/helpers": "^0.1.21",
+		"@dnd-kit/abstract": "^0.2.4",
+		"@dnd-kit/helpers": "^0.2.4",
 		"@eslint/js": "latest",
 		"@fontsource-variable/inter": "latest",
 		"@internationalized/date": "^3.12.2",
