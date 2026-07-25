@@ -118,7 +118,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   event.locals.user = user;
   event.locals.accessToken = accessToken ?? null;
 
-  const publicRoutePrefixes = ['/', '/auth'];
+  const publicRoutePrefixes = ['/', '/auth', '/access'];
   const isPublicRoute =
     publicRoutePrefixes.some((p) => (p === '/' ? pathname === '/' : pathname.startsWith(p))) ||
     pathname.startsWith('/api/');
