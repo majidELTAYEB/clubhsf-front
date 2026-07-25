@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { env as publicEnv } from '$env/dynamic/public';
 
 export interface LiveAccessResponse {
 	liveStreamId: string;
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 		return { error: 'missing_token' as const, grant: null };
 	}
 
-	const res = await fetch(`${PUBLIC_API_BASE_URL}/live/access?token=${encodeURIComponent(token)}`);
+	const res = await fetch(`${publicEnv.PUBLIC_API_BASE_URL}/live/access?token=${encodeURIComponent(token)}`);
 
 	if (!res.ok) {
 		const body = await res.json().catch(() => null);

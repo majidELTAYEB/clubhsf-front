@@ -73,20 +73,24 @@
 					</div>
 				</DropdownMenu.Label>
 				<DropdownMenu.Separator />
-				<!-- <DropdownMenu.Group>
-					<DropdownMenu.Item>
+				<DropdownMenu.Group>
+					<!-- <DropdownMenu.Item>
 						<BadgeCheckIcon />
 						Compte
-					</DropdownMenu.Item>
+					</DropdownMenu.Item> -->
 					<DropdownMenu.Item>
-						<CreditCardIcon />
-						Facturation
+						{#snippet child({ props })}
+							<a href="/billing" {...props}>
+								<CreditCardIcon />
+								Facturation
+							</a>
+						{/snippet}
 					</DropdownMenu.Item>
-					<DropdownMenu.Item>
+					<!-- <DropdownMenu.Item>
 						<BellIcon />
 						Notifications
-					</DropdownMenu.Item>
-				</DropdownMenu.Group> -->
+					</DropdownMenu.Item> -->
+				</DropdownMenu.Group>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item>
 					{#snippet child({ props })}

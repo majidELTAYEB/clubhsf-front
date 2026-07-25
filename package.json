@@ -21,7 +21,7 @@
 		"@fontsource-variable/inter": "latest",
 		"@internationalized/date": "^3.12.2",
 		"@lucide/svelte": "^1.25.0",
-		"@sveltejs/adapter-auto": "latest",
+		"@sveltejs/adapter-node": "^5.5.7",
 		"@sveltejs/kit": "^2.63.0",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@tabler/icons-svelte": "^3.45.0",
