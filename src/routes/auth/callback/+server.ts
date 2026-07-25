@@ -7,6 +7,7 @@ import {
 	AUTH0_CALLBACK_PATH
 } from '$lib/config/auth0.config';
 import type { TokenSet } from '$lib/features/auth/types';
+import { env } from '$env/dynamic/public';
 
 type UserProfile = {
 	id: string;
@@ -15,8 +16,6 @@ type UserProfile = {
 	role: string;
 	is_premium: boolean;
 	created_at: string;
-	// ID Auth0 natif (ex: "auth0|..."), exposé par le backend — distinct de `id`,
-	// l'UUID interne. Nécessaire pour tout appel à la Management API Auth0.
 	auth_id: string;
 };
 
@@ -72,9 +71,9 @@ export const GET: RequestHandler = async ({ url, cookies, fetch }) => {
 
 	const tokens: TokenSet = await res.json();
 
-	const meRes = await fetch('http://localhost:8080/api/v1/me', {
-		headers: { Authorization: `Bearer ${tokens.access_token}` }
-	});
+	const meRes = await fetch(`${env.BACKEND_URL}/me`, {
+	headers: { Authorization: `Bearer ${tokens.access_token}` }
+});
 
 	if (!meRes.ok) {
 		throw error(401, 'Impossible de récupérer le profil utilisateur');
