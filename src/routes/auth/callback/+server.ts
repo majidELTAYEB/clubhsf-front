@@ -7,7 +7,7 @@ import {
 	AUTH0_CALLBACK_PATH
 } from '$lib/config/auth0.config';
 import type { TokenSet } from '$lib/features/auth/types';
-import { env } from '$env/dynamic/public';
+import { env } from '$env/dynamic/private';
 
 type UserProfile = {
 	id: string;
