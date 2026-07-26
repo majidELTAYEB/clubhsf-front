@@ -30,7 +30,6 @@ export const load: PageServerLoad = async ({ fetch, params, url }) => {
 
 	}
 
-	console.log(nextVideo)
 
 	return { video, nextVideo, collectionId };
 };

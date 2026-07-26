@@ -13,13 +13,20 @@ export const load: PageServerLoad = async ({ locals, cookies, url }) => {
 		headers: { Authorization: `Bearer ${locals.accessToken}` }
 	});
 
+
+	let isPremium = false;
+
+
 	if (res.ok) {
-		const { is_premium } = await res.json();
+		const body = await res.json();
+		isPremium = body.is_premium;
+
+
 		const existing = cookies.get('user_profile');
 		const profile = existing ? JSON.parse(existing) : {};
-
 		const isSecureContext = url.protocol === 'https:';
-		cookies.set('user_profile', JSON.stringify({ ...profile, is_premium }), {
+
+		cookies.set('user_profile', JSON.stringify({ ...profile, is_premium: isPremium }), {
 			path: '/',
 			httpOnly: true,
 			secure: isSecureContext,
@@ -28,5 +35,9 @@ export const load: PageServerLoad = async ({ locals, cookies, url }) => {
 		});
 	}
 
-	redirect(302, '/masterclass');
+	if (isPremium) {
+		redirect(302, '/masterclass');
+	}
+
+	return { isPremium };
 };

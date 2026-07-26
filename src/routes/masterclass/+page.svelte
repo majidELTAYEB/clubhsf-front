@@ -60,7 +60,7 @@
 		--border: #e6e3db;
 		--accent: #b23a1f;
 
-		background: var(--bg);
+		/* background: var(--bg); */
 		color: var(--fg);
 		font-family: 'Inter', sans-serif;
 		min-height: 100%;
@@ -147,9 +147,9 @@
 		display: grid;
 		grid-template-columns: 1fr;
 		gap: 1px;
-		background: var(--border);
+		/* background: var(--border); */
 		margin-top: 2.5rem;
-		border: 1px solid var(--border);
+		/* border: 1px solid var(--border); */
 	}
 
 	@media (min-width: 640px) {

@@ -3,6 +3,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import CheckIcon from "@lucide/svelte/icons/check";
 	import LoaderIcon from "@lucide/svelte/icons/loader";
+	import { onDestroy, onMount } from 'svelte';
 
 	let { data }: { data: { isPremium?: boolean } } = $props();
 
@@ -10,9 +11,28 @@
 
 	async function retry() {
 		retrying = true;
-		await invalidateAll(); // relance le `load` → refait /me
+		await invalidateAll();
 		retrying = false;
 	}
+
+	let attempts = $state(0);
+	const MAX_ATTEMPTS = 6;
+	let timeoutId: ReturnType<typeof setTimeout>;
+
+	async function poll() {
+		if (data.isPremium || attempts >= MAX_ATTEMPTS) return;
+		attempts++;
+		await invalidateAll();
+		if (!data.isPremium) {
+			timeoutId = setTimeout(poll, 2000 * attempts); // backoff simple
+		}
+	}
+
+	onMount(() => {
+		if (!data.isPremium) poll();
+	});
+
+	onDestroy(() => clearTimeout(timeoutId));
 </script>
 
 <svelte:head>
