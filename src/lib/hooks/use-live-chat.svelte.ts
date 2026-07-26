@@ -1,91 +1,14 @@
-// type ChatMessage = { id: string; viewerId: string; content: string };
-// type RawChatMessage = { viewerId: string; content: string };
-
-// const WS_BASE = 'ws://localhost:8080';
-
-// export function useLiveChat(streamId: string, token: string) {
-// 	let messages = $state<ChatMessage[]>([]);
-// 	let connected = $state(false);
-// 	let ws: WebSocket | null = null;
-// 	let reconnectTimeout: ReturnType<typeof setTimeout>;
-// 	let heartbeatInterval: ReturnType<typeof setInterval>;
-
-// 	function connect() {
-// 		ws = new WebSocket(`${WS_BASE}/ws/telemetry?token=${encodeURIComponent(token)}`);
-
-// 		ws.onopen = () => {
-// 			connected = true;
-// 			sendRaw({ type: 'heartbeat', streamId });
-// 			heartbeatInterval = setInterval(() => sendRaw({ type: 'heartbeat', streamId }), 10000);
-// 		};
-
-// 		ws.onmessage = (event) => {
-// 			const msg = JSON.parse(event.data);
-// 			console.log(msg)
-// 			if (msg.type !== 'chat') return;
-// 			messages.push({
-// 				id: crypto.randomUUID(),
-// 				viewerId: msg.viewerId,
-// 				content: msg.content
-// 			});
-// 		};
-
-// 		ws.onclose = () => {
-// 			connected = false;
-// 			clearInterval(heartbeatInterval);
-// 			reconnectTimeout = setTimeout(connect, 2000);
-// 		};
-
-// 		ws.onerror = () => ws?.close();
-// 	}
-
-// 	function sendRaw(payload: unknown) {
-// 		if (ws?.readyState !== WebSocket.OPEN) return;
-// 		ws.send(JSON.stringify(payload));
-// 	}
-
-// 	function send(content: string) {
-// 		sendRaw({ type: 'chat', streamId, content });
-// 	}
-
-// 	function disconnect() {
-// 		clearTimeout(reconnectTimeout);
-// 		clearInterval(heartbeatInterval);
-// 		ws?.close();
-// 		ws = null;
-// 	}
-
-// 	function setHistory(history: RawChatMessage[]) {
-// 		messages = history.map((m, i) => ({
-// 			id: `history-${i}`,
-// 			viewerId: m.viewerId,
-// 			content: m.content
-// 		}));
-// 	}
-
-// 	return {
-// 		get messages() {
-// 			return messages;
-// 		},
-// 		get connected() {
-// 			return connected;
-// 		},
-// 		connect,
-// 		disconnect,
-// 		send,
-// 		setHistory
-// 	};
-// }
+import { env } from '$env/dynamic/public';
 
 type ChatMessage = { id: string; viewerId: string; content: string };
 type RawChatMessage = { viewerId: string; content: string };
 
-const WS_HOST = import.meta.env.VITE_WS_HOST as string; // ex: 'api.tondomaine.com'
-
 function getWsUrl(token: string): string {
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-	return `${protocol}://${WS_HOST}/ws/telemetry?token=${encodeURIComponent(token)}`;
+	const apiHost = new URL(env.PUBLIC_API_BASE_URL).host;
+	return `${protocol}://${apiHost}/ws/telemetry?token=${encodeURIComponent(token)}`;
 }
+
 
 export function useLiveChat(streamId: string, token: string) {
 	let messages = $state<ChatMessage[]>([]);

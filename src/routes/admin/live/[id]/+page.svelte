@@ -14,12 +14,13 @@
 	import LiveChat from '$lib/components/live-chat.svelte';
 
 	import { getHistoryChat, getViewerCount } from '$lib/features/admin-live/api';
+	import { env } from '$env/dynamic/public';
 
 	let { data }: { data: PageData } = $props();
 	const live = data.live;
 
 	let liveStream = $derived(live);
-	let isLive = $derived(live.status === 'live');
+	let isLive = $derived(live.status === 'active');
 
 	let copiedField = $state<string | null>(null);
 	let isEnding = $state(false);
@@ -85,7 +86,8 @@
 
 	function connectChatSocket() {
 		const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-		const wsUrl = `${protocol}://localhost:8080/ws/telemetry?token=${encodeURIComponent(data.wsToken ?? '')}`;
+		const apiHost = new URL(env.PUBLIC_API_BASE_URL).host;
+		const wsUrl = `${protocol}://${apiHost}/ws/telemetry?token=${encodeURIComponent(data.wsToken ?? '')}`;
 
 		chatSocket = new WebSocket(wsUrl);
 
