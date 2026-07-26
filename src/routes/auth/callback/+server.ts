@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ url, cookies, fetch }) => {
 	const state = url.searchParams.get('state');
 	const storedState = cookies.get('auth0_state');
 	const verifier = cookies.get('auth0_verifier');
-	const redirectTo = cookies.get('auth0_redirect') ?? '/auth';
+	const redirectTo = cookies.get('auth0_redirect') ?? '/';
 
 	const authError = url.searchParams.get('error');
 	const authErrorDescription = url.searchParams.get('error_description');
