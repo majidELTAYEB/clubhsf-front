@@ -9,7 +9,6 @@
         description?: string;
         cover_image_url?: string;
         is_public: boolean;
-        video_count?: number;
         created_at: string;
     };
 
@@ -32,10 +31,6 @@
             header: "Titre",
         },
         {
-            accessorKey: "video_count",
-            header: "Vidéos",
-        },
-        {
             accessorKey: "is_public",
             header: "Statut",
         },
@@ -45,7 +40,7 @@
         },
         {
             accessorKey: "created_at",
-            header: "Créée le",
+            header: "Créé le",
         },
         {
             id: "actions",
@@ -114,6 +109,7 @@
         createCollection,
 
     } from "../features/new-video/api";
+	import { object } from "zod";
 
 
     // ⚠️ Adapte le chemin d'import selon ton projet
@@ -287,7 +283,7 @@
                             checked={column.getIsVisible()}
                             onCheckedChange={(value) => column.toggleVisibility(!!value)}
                         >
-                            {column.id}
+                            {column.columnDef.header}
                         </DropdownMenu.CheckboxItem>
                     {/each}
                 </DropdownMenu.Content>
@@ -460,10 +456,6 @@
                             {/if}
                         </div>
                     </div>
-                {:else if cell.column.id === 'video_count'}
-                    <span class="text-sm text-muted-foreground">
-                        {row.original.video_count ?? 0}
-                    </span>
                 {:else if cell.column.id === 'is_public'}
                     {#if row.original.is_public}
                         <Badge variant="default">Publiée</Badge>

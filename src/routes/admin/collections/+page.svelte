@@ -40,6 +40,7 @@
     };
 
     let collections = $state<Collection[]>([]);
+  
     let isLoading = $state(true);
     let searchQuery = $state("");
 
