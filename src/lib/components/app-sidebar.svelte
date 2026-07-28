@@ -9,7 +9,7 @@
 	const navMain = [
 		{ title: "Masterclass", url: "/masterclass", icon: Clapperboard, isActive: true },
 		{ title: "Live", url: "/lives", icon: Webcam, isActive: true },
-		{ title: "Replay Live", url: "#", icon: Videotape, isActive: true },
+		{ title: "Replay Live", url: "/livestreams-replays", icon: Videotape, isActive: true },
 	];
 
 	const navSecondary = [

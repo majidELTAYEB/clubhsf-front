@@ -39,7 +39,7 @@
     //     addVideoToCollection,
     //     getVideos,
     // } from "$lib/api";
-    import { getCollection, getCollectionVideos, updateCollection, deleteCollection } from "$lib/features/admin-collection/api";
+    import { getCollection, getCollectionVideos, updateCollection, deleteCollection, removeVideoFromCollection, deleteVideo } from "$lib/features/admin-collection/api";
     // ⚠️ Adapte le chemin vers le composant de ton layout
 	import CreateVideoDrawer from "$lib/features/admin-collection/components/create-video-drawer.svelte";
 
@@ -80,6 +80,10 @@
     // Ajout de vidéo (drawer partagé du layout : créer + uploader + rattacher)
     let isCreateVideoOpen = $state(false);
     let wasCreateVideoOpen = $state(false);
+
+    let isRemoveVideoDialogOpen = $state(false);
+let videoToRemove = $state<CollectionVideo | null>(null);
+let isRemovingVideo = $state(false);
 
     $effect(() => {
         // Le drawer se ferme dès que l'upload démarre (la vidéo existe déjà
@@ -218,6 +222,28 @@
             isDeleting = false;
         }
     }
+
+
+function openRemoveVideoDialog(video: CollectionVideo) {
+    videoToRemove = video;
+    isRemoveVideoDialogOpen = true;
+}
+
+async function handleRemoveVideo() {
+    if (!videoToRemove || !collection) return;
+    isRemovingVideo = true;
+    try {
+        await removeVideoFromCollection(collection.id, videoToRemove.video_id);
+        await deleteVideo(videoToRemove.video_id);
+        videos = videos.filter((v) => v.video_id !== videoToRemove!.video_id);
+        toast.success("Vidéo supprimée");
+        isRemoveVideoDialogOpen = false;
+    } catch (err) {
+        toast.error("Impossible de supprimer la vidéo");
+    } finally {
+        isRemovingVideo = false;
+    }
+}
 
     	let brokenThumbs = $state(new Set<string>());
  
@@ -389,7 +415,7 @@
 	<div class="space-y-2">
 		{#each videos as video (video.video_id)}
 			{@const status = getStatus(video.status)}
-			<Item.Root variant="outline">
+			<!-- <Item.Root variant="outline">
 				<Item.Media variant="image">
 					{#if video.thumbnail_url && !brokenThumbs.has(video.video_id)}
 						<img
@@ -413,7 +439,42 @@
 						<span>{status.label}</span>
 					</div>
 				</Item.Content>
-			</Item.Root>
+			</Item.Root> -->
+
+            <Item.Root variant="outline">
+    <Item.Media variant="image">
+        {#if video.thumbnail_url && !brokenThumbs.has(video.video_id)}
+            <img
+                src={video.thumbnail_url}
+                alt={video.title}
+                width="32"
+                height="32"
+                class="size-8 rounded object-cover"
+                onerror={() => handleThumbError(video.video_id)}
+            />
+        {:else}
+            <div class="flex size-8 items-center justify-center rounded bg-muted">
+                <ImageOffIcon class="size-3.5 text-muted-foreground" />
+            </div>
+        {/if}
+    </Item.Media>
+    <Item.Content>
+        <Item.Title class="line-clamp-1">{video.title}</Item.Title>
+        <div class="flex items-center gap-1 text-xs {status.class}">
+            <status.icon class="size-3 {video.status === 'processing' || video.status === 'queued' ? 'animate-spin' : ''}" />
+            <span>{status.label}</span>
+        </div>
+    </Item.Content>
+    <Button
+    variant="ghost"
+    size="icon"
+    class="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+    onclick={() => openRemoveVideoDialog(video)}
+>
+    <TrashIcon class="size-4" />
+    <span class="sr-only">Supprimer la vidéo</span>
+</Button>
+</Item.Root>
 		{/each}
 	</div>
 </ScrollArea>
@@ -522,6 +583,33 @@
                     <Spinner class="size-4 mr-2" /> Suppression...
                 {:else}
                     Supprimer définitivement
+                {/if}
+            </AlertDialog.Action>
+        </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root>
+
+<AlertDialog.Root bind:open={isRemoveVideoDialogOpen}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Supprimer cette vidéo ?</AlertDialog.Title>
+            <AlertDialog.Description>
+                {#if videoToRemove}
+                    « {videoToRemove.title} » sera définitivement supprimée. Cette action est irréversible.
+                {/if}
+            </AlertDialog.Description>
+        </AlertDialog.Header>
+        <AlertDialog.Footer>
+            <AlertDialog.Cancel disabled={isRemovingVideo}>Annuler</AlertDialog.Cancel>
+            <AlertDialog.Action
+                class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                disabled={isRemovingVideo}
+                onclick={handleRemoveVideo}
+            >
+                {#if isRemovingVideo}
+                    <Spinner class="size-4 mr-2" /> Suppression...
+                {:else}
+                    Supprimer
                 {/if}
             </AlertDialog.Action>
         </AlertDialog.Footer>

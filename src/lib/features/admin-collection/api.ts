@@ -16,3 +16,10 @@ export const updateCollection = async (collectionId: string, data: { title?: str
 export const deleteCollection = async (collectionId: string) => {
   return api.del(`/collections/${collectionId}`);
 };
+
+export const removeVideoFromCollection = async (collectionId: string, videoId: string) => {
+  return api.del(`/collections/${collectionId}/videos/${videoId}`);
+};
+export const deleteVideo = async (videoId: string) => {
+  return api.del(`/videos/${videoId}`);
+};
