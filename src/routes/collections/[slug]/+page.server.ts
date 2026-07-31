@@ -5,6 +5,8 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ fetch, params }) => {
 	const res = await fetch(`/api/collections/${params.slug}`);
 
+	console.log(res)
+
 	if (res.status === 404) {
 		console.log(res)
 		throw error(404, "impossible de charger les videos collections");

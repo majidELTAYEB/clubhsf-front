@@ -39,7 +39,7 @@
     //     addVideoToCollection,
     //     getVideos,
     // } from "$lib/api";
-    import { getCollection, getCollectionVideos, updateCollection, deleteCollection, removeVideoFromCollection, deleteVideo } from "$lib/features/admin-collection/api";
+    import { getCollection, getCollectionItems, updateCollection, deleteCollection, removeVideoFromCollection, deleteVideo } from "$lib/features/admin-collection/api";
     // ⚠️ Adapte le chemin vers le composant de ton layout
 	import CreateVideoDrawer from "$lib/features/admin-collection/components/create-video-drawer.svelte";
 
@@ -122,21 +122,24 @@ let isRemovingVideo = $state(false);
         }
     }
 
-    async function loadVideos() {
-        isLoadingVideos = true;
-        try {
-            // 🐛 corrigé : la fonction n'était ni appelée ni attendue,
-            // et l'id de la collection n'était pas passé.
-            const data = await getCollectionVideos(collectionId);
-            videos = [...data.data].sort(
-                (a: CollectionVideo, b: CollectionVideo) => a.position - b.position
-            );
-        } catch (err) {
-            toast.error("Impossible de charger les vidéos de la collection");
-        } finally {
-            isLoadingVideos = false;
-        }
+async function loadVideos() {
+    isLoadingVideos = true;
+    try {
+        const data = await getCollectionItems(collectionId);
+        console.log(data);
+        videos = data.data
+            .filter((item: CollectionItem) => item.item_type === "video")
+            .map((item: CollectionItem) => ({
+                ...item.video,
+                position: item.position
+            }))
+            .sort((a: CollectionVideo, b: CollectionVideo) => a.position - b.position);
+    } catch (err) {
+        toast.error("Impossible de charger les vidéos de la collection");
+    } finally {
+        isLoadingVideos = false;
     }
+}
 
     $effect(() => {
         loadCollection();

@@ -5,8 +5,8 @@ export function getCollection(id : string) {
   return api.get<CollectionResponse>(`/collections/${id}`);
 }
 
-export const getCollectionVideos = async (collectionId: string) => {
-  return api.get(`/collections/${collectionId}/videos`);
+export const getCollectionItems = async (collectionId: string) => {
+  return api.get(`/collections/${collectionId}/items`);
 };
 
 export const updateCollection = async (collectionId: string, data: { title?: string; description?: string; is_public?: boolean }) => {
@@ -18,7 +18,7 @@ export const deleteCollection = async (collectionId: string) => {
 };
 
 export const removeVideoFromCollection = async (collectionId: string, videoId: string) => {
-  return api.del(`/collections/${collectionId}/videos/${videoId}`);
+  return api.del(`/collections/${collectionId}/video/${videoId}`);
 };
 export const deleteVideo = async (videoId: string) => {
   return api.del(`/videos/${videoId}`);
