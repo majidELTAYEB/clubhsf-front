@@ -23,3 +23,60 @@ export const removeVideoFromCollection = async (collectionId: string, videoId: s
 export const deleteVideo = async (videoId: string) => {
   return api.del(`/videos/${videoId}`);
 };
+
+
+export function getArticle(id: string) {
+  return api.get(`/articles/${id}`);
+}
+
+export function getArticleBySlug(slug: string) {
+  return api.get(`/articles/slug/${slug}`);
+}
+
+export function listArticles() {
+  return api.get(`/articles`);
+}
+
+export function createArticle(data: { title: string; excerpt?: string; content: object }) {
+  return api.post(`/articles`, data);
+}
+
+export function updateArticle(
+  id: string,
+  data: { title: string; excerpt?: string; content: object; is_public: boolean }
+) {
+  return api.patch(`/articles/${id}`, data);
+}
+
+export function deleteArticle(id: string) {
+  return api.del(`/articles/${id}`);
+}
+
+export async function presignArticleImage(filename: string, contentType: string) {
+  const res = await api.post<{ data: { upload_url: string; public_url: string } }>(
+    `/articles/images/presign`,
+    { filename, content_type: contentType }
+  );
+  return res.data;
+}
+
+export function presignArticleImagesBatch(
+  items: { filename: string; content_type: string }[]
+) {
+  return api.post<{
+    items: { filename: string; upload_url: string; public_url: string; error?: string }[];
+  }>(`/articles/images/presign-batch`, { items });
+}
+
+export async function uploadArticleImage(file: File): Promise<string> {
+	const { upload_url, public_url } = await presignArticleImage(file.name, file.type);
+
+	const putRes = await fetch(upload_url, {
+		method: 'PUT',
+		headers: { 'Content-Type': file.type },
+		body: file
+	});
+	if (!putRes.ok) throw new Error("Échec de l'upload vers le stockage");
+
+	return public_url;
+}

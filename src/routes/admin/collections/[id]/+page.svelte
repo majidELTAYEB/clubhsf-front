@@ -42,6 +42,7 @@
     import { getCollection, getCollectionItems, updateCollection, deleteCollection, removeVideoFromCollection, deleteVideo } from "$lib/features/admin-collection/api";
     // ⚠️ Adapte le chemin vers le composant de ton layout
 	import CreateVideoDrawer from "$lib/features/admin-collection/components/create-video-drawer.svelte";
+	import CreateArticleDrawer from "$lib/features/admin-collection/components/create-article-drawer.svelte";
 
     type Collection = {
         id: string;
@@ -79,6 +80,7 @@
 
     // Ajout de vidéo (drawer partagé du layout : créer + uploader + rattacher)
     let isCreateVideoOpen = $state(false);
+    let isCreateArticleOpen =$state(false)
     let wasCreateVideoOpen = $state(false);
 
     let isRemoveVideoDialogOpen = $state(false);
@@ -509,7 +511,8 @@ async function handleRemoveVideo() {
 </div>
 
 <!-- Drawer/Dialog partagé du layout : créer une vidéo et l'ajouter à cette collection -->
-<CreateVideoDrawer bind:open={isCreateVideoOpen} collectionId={collection?.id} collectionTitle={collection?.title} />
+<!-- <CreateVideoDrawer bind:open={isCreateVideoOpen} collectionId={collection?.id} collectionTitle={collection?.title} /> -->
+<CreateArticleDrawer bind:open={isCreateVideoOpen} collectionId={collection?.id} collectionTitle={collection?.title} />
 
 <!-- Dialog : modification des infos d'une vidéo -->
 <Dialog.Root bind:open={isEditVideoDialogOpen}>
