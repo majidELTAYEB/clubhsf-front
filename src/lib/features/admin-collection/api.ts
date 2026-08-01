@@ -80,3 +80,15 @@ export async function uploadArticleImage(file: File): Promise<string> {
 
 	return public_url;
 }
+
+export const addArticleToCollection = async (collectionId: string, articleId: string) => {
+  return api.post(`/collections/${collectionId}/articles`, { article_id: articleId });
+};
+
+export const removeItemFromCollection = async (
+  collectionId: string,
+  itemType: "video" | "article",
+  itemId: string
+) => {
+  return api.del(`/collections/${collectionId}/items/${itemType}/${itemId}`);
+};

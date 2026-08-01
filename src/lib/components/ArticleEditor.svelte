@@ -46,9 +46,6 @@
 	let isUploading = $state(false);
 	let fileInput: HTMLInputElement;
 
-	// Force Svelte à re-render l'état des boutons (actif/inactif) à chaque
-	// changement de sélection ou de contenu — Tiptap est du vanilla JS,
-	// Svelte ne sait pas naturellement qu'il doit re-render sans ce hook.
 	let updateTick = $state(0);
 
 	onMount(() => {
@@ -123,7 +120,7 @@
 
 <input type="file" accept="image/*" bind:this={fileInput} onchange={handleImagePick} hidden />
 
-<!-- Bulle flottante : formatage inline, apparaît au survol d'une sélection -->
+
 <div bind:this={bubbleMenuEl} class="bubble-menu">
 	{#if editor}
 		{#key updateTick}
@@ -199,7 +196,7 @@
 	{/if}
 </div>
 
-<!-- Menu flottant : insertion de blocs, apparaît sur une ligne vide -->
+
 <div bind:this={floatingMenuEl} class="floating-menu">
 	{#if editor}
 		<button onclick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} title="Titre 1">
