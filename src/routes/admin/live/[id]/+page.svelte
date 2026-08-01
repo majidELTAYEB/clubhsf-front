@@ -105,7 +105,6 @@
 			try {
 				const msg = JSON.parse(event.data);
 				if (msg.type !== 'chat') return;
-				console.log(msg)
 				chatMessages = [...chatMessages, {
 					id: crypto.randomUUID(),
 					viewerId: msg.viewerId,

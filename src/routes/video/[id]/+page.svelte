@@ -115,12 +115,12 @@
             {#if nextVideo}
 <aside class="archive__aside">
     <span class="eyebrow">Ensuite</span>
-    <a href="/video/{nextVideo.video_id}?collection={data.collectionId}" class="next-entry">
+    <a href="/video/{nextVideo.video.video_id}?collection={data.collectionId}" class="next-entry">
         <div class="next-entry__thumb">
-            <img src={nextVideo.thumbnail_url} alt={nextVideo.title} />
+            <img src={nextVideo.video.thumbnail_url} alt={nextVideo.video.title} />
         </div>
         <div class="next-entry__text">
-            <span class="next-entry__title">{nextVideo.title}</span>
+            <span class="next-entry__title">{nextVideo.video.title}</span>
             <span class="next-entry__cta">Regarder <ArrowRightIcon size={12} strokeWidth={1.75} /></span>
         </div>
     </a>

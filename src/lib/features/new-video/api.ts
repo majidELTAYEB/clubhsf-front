@@ -19,5 +19,5 @@ export function createCollection(body: NewCollectionRequest) {
 }
 
 export function addVideoToCollection(collectionId: string, videoId: string) {
-  return api.post<Collection>(`/collections/${collectionId}/items`, { video_id: videoId });
+  return api.post<Collection>(`/collections/${collectionId}/videos`, { video_id: videoId });
 }

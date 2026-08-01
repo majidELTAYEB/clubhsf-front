@@ -51,7 +51,6 @@
         try {
             coverImageUrl = await uploadArticleImage(file);
 
-            console.log(coverImageUrl)
         } catch (err) {
             toast.error("Échec de l'upload de l'image de couverture");
         } finally {

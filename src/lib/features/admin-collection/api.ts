@@ -95,6 +95,5 @@ export function createArticle(data: {
   content: object;
   cover_image_url?: string;
 }) {
-  console.log(data)
   return api.post(`/articles`, data);
 }

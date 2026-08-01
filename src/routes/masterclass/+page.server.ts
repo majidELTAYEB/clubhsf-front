@@ -5,7 +5,6 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	const res = await fetch('/api/collections');
 
 	if (!res.ok) {
-		console.log(res);
 		throw error(res.status, 'Impossible de charger les collections');
 	}
 

@@ -127,11 +127,9 @@ export const load: PageServerLoad = async ({ fetch, params }) => {
 		throw error(404, 'Impossible de charger la collection');
 	}
 	if (!collectionRes.ok) {
-		console.log(collectionRes);
 		throw error(collectionRes.status, 'Impossible de charger la collection');
 	}
 	if (!itemsRes.ok) {
-		console.log(itemsRes);
 		throw error(itemsRes.status, 'Impossible de charger les items');
 	}
 
@@ -173,7 +171,6 @@ export const load: PageServerLoad = async ({ fetch, params }) => {
 			Position: item.position
 		}));
 
-		console.log(articles)
 
 	return {
 		collection: {

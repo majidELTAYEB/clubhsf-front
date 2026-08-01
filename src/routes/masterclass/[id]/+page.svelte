@@ -429,6 +429,9 @@
 
 							<div class="video-card__scrim">
 								<h3 class="video-card__title">{video.Title}</h3>
+								{#if video.Description}
+									<p class="article-card__excerpt">{video.Description}</p>
+								{/if}
 								<span class="video-card__watch">
 									<Play size={11} strokeWidth={2} />
 									Regarder
