@@ -217,9 +217,6 @@
     </Card>
 
     <Card>
-        <CardHeader>
-            <CardTitle>Contenu</CardTitle>
-        </CardHeader>
         <CardContent>
             <ArticleEditor bind:content />
         </CardContent>
