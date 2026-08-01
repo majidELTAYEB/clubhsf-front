@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
+	import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
 	import TiptapContent from '$lib/components/tiptap-content.svelte';
 	import type { TiptapNode } from '$lib/components/tiptap-node.svelte';
 
@@ -9,13 +10,24 @@
 		slug: string;
 		excerpt: string | null;
 		content: TiptapNode;
+		cover_image_url: string | null;
 		is_public: boolean;
 		created_at: string;
 		updated_at: string;
 	};
 
-	let { data }: { data: { article: Article } } = $props();
+	type NextArticle = {
+		article_id: string;
+		title: string;
+		slug: string;
+		excerpt?: string | null;
+		cover_image_url?: string | null;
+		position: number;
+	};
+
+	let { data }: { data: { article: Article; nextArticle: NextArticle | null; collectionId: string | null } } = $props();
 	let article = $derived(data.article);
+	let nextArticle = $derived(data.nextArticle);
 
 	function extractText(node: TiptapNode): string {
 		if (node.type === 'text') return node.text ?? '';
@@ -37,10 +49,10 @@
 
 <div class="archive">
 	<div class="masthead">
-		<a href="/masterclass" class="back-link">
-			<ArrowLeftIcon size={13} strokeWidth={1.75} />
-			<span>Articles</span>
-		</a>
+                <button type="button" on:click={() => history.back()} class="back-link">
+            <ArrowLeftIcon size={13} strokeWidth={1.75} />
+            <span>Retour</span>
+        </button>
 	</div>
 
 	<article class="archive__inner">
@@ -56,9 +68,35 @@
 			{/if}
 		</header>
 
+		{#if article.cover_image_url}
+			<div class="cover">
+				<img src={article.cover_image_url} alt={article.title} />
+			</div>
+		{/if}
+
 		<div class="body">
 			<TiptapContent content={article.content} />
 		</div>
+
+		{#if nextArticle}
+			<aside class="next">
+				<span class="eyebrow">Ensuite</span>
+				<a href="/article/{nextArticle.article.slug}?collection={data.collectionId}" class="next-entry">
+					{#if nextArticle.article.cover_image_url}
+						<div class="next-entry__thumb">
+							<img src={nextArticle.article.cover_image_url} alt={nextArticle.title} />
+						</div>
+					{/if}
+					<div class="next-entry__text">
+						<span class="next-entry__title">{nextArticle.article.title}</span>
+						{#if nextArticle.article.excerpt}
+							<span class="next-entry__excerpt">{nextArticle.article.excerpt}</span>
+						{/if}
+						<span class="next-entry__cta">Lire <ArrowRightIcon size={12} strokeWidth={1.75} /></span>
+					</div>
+				</a>
+			</aside>
+		{/if}
 	</article>
 </div>
 
@@ -139,7 +177,94 @@
 		max-width: 56ch;
 	}
 
+	.cover {
+		margin-top: 2.5rem;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+	}
+	.cover img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
 	.body {
 		margin-top: 2.5rem;
+	}
+
+	/* Article suivant */
+	.next {
+		margin-top: 4rem;
+		padding-top: 2rem;
+		border-top: 1px solid var(--border);
+	}
+
+	.eyebrow {
+		display: block;
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--muted);
+		margin-bottom: 1rem;
+	}
+
+	.next-entry {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.next-entry__thumb {
+		width: 6.5rem;
+		aspect-ratio: 4 / 3;
+		flex-shrink: 0;
+		overflow: hidden;
+	}
+	.next-entry__thumb img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: grayscale(1) contrast(1.05);
+		transition: filter 0.4s ease;
+	}
+	.next-entry:hover .next-entry__thumb img {
+		filter: grayscale(0);
+	}
+
+	.next-entry__text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		min-width: 0;
+	}
+	.next-entry__title {
+		font-family: 'Fraunces', serif;
+		font-style: italic;
+		font-size: 1.15rem;
+		line-height: 1.3;
+	}
+	.next-entry__excerpt {
+		font-size: 0.82rem;
+		line-height: 1.4;
+		color: var(--muted);
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.next-entry__cta {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin-top: 0.15rem;
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--accent);
 	}
 </style>

@@ -12,10 +12,11 @@
     import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
     import AlertCircleIcon from "@lucide/svelte/icons/alert-circle";
     import FolderIcon from "@lucide/svelte/icons/folder";
+    import ImageIcon from "@lucide/svelte/icons/image";
     import { toast } from "svelte-sonner";
 
     import ArticleEditor from "$lib/components/ArticleEditor.svelte";
-    import { createArticle, addArticleToCollection } from "$lib/features/admin-collection/api";
+    import { createArticle, addArticleToCollection, uploadArticleImage } from "$lib/features/admin-collection/api";
 
     // --- Contexte "collection" venu de l'URL (?collection=uuid&collectionTitle=...) ---
     const collectionId = page.url.searchParams.get("collection") ?? undefined;
@@ -25,6 +26,9 @@
     let title = $state("");
     let excerpt = $state("");
     let content = $state<object | null>(null);
+    let coverImageUrl = $state("");
+    let isUploadingCover = $state(false);
+    let coverFileInput: HTMLInputElement;
 
     let isSaving = $state(false);
     let error = $state<string | null>(null);
@@ -37,6 +41,23 @@
 
     function targetRoute(): string {
         return collectionId ? `/admin/collections/${collectionId}` : "/admin/articles";
+    }
+
+    async function handleCoverPick(e: Event) {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        isUploadingCover = true;
+        try {
+            coverImageUrl = await uploadArticleImage(file);
+
+            console.log(coverImageUrl)
+        } catch (err) {
+            toast.error("Échec de l'upload de l'image de couverture");
+        } finally {
+            isUploadingCover = false;
+            (e.target as HTMLInputElement).value = "";
+        }
     }
 
     /**
@@ -52,6 +73,7 @@
             title: title.trim(),
             excerpt: excerpt.trim() === "" ? undefined : excerpt.trim(),
             content: content as object,
+            cover_image_url: coverImageUrl || undefined,
         });
         const article = result.data;
 
@@ -153,6 +175,44 @@
                     rows={2}
                     placeholder="Un court résumé affiché dans les listes..."
                 />
+            </div>
+            <div class="grid gap-2">
+                <Label>Image de couverture</Label>
+                <input
+                    type="file"
+                    accept="image/*"
+                    bind:this={coverFileInput}
+                    onchange={handleCoverPick}
+                    hidden
+                />
+                <div class="flex items-start gap-3">
+                    <button
+                        type="button"
+                        class="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md border bg-muted"
+                        onclick={() => coverFileInput.click()}
+                        disabled={isUploadingCover}
+                    >
+                        {#if isUploadingCover}
+                            <Spinner class="size-5" />
+                        {:else if coverImageUrl}
+                            <img src={coverImageUrl} alt="Couverture" class="size-full object-cover" />
+                        {:else}
+                            <ImageIcon class="size-6 text-muted-foreground" />
+                        {/if}
+                    </button>
+                    <div class="flex-1 space-y-1">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onclick={() => coverFileInput.click()}
+                            disabled={isUploadingCover}
+                        >
+                            {coverImageUrl ? "Changer l'image" : "Choisir une image"}
+                        </Button>
+                        <p class="text-xs text-muted-foreground">Format recommandé : 1280×720, JPG ou PNG.</p>
+                    </div>
+                </div>
             </div>
         </CardContent>
     </Card>

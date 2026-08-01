@@ -443,7 +443,7 @@
 				<h2 class="section-heading">Articles</h2>
 				<div class="video-grid">
 					{#each data.articles as article (article.ID)}
-						<a href={`/article/${article.Slug}`} class="video-card">
+						<a href={`/article/${article.Slug}?collection=${data.collection.id}`} class="video-card">
 							{#if article.CoverImageURL}
 								<img
 									class="video-card__img"

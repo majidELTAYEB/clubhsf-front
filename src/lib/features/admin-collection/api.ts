@@ -37,10 +37,6 @@ export function listArticles() {
   return api.get(`/articles`);
 }
 
-export function createArticle(data: { title: string; excerpt?: string; content: object }) {
-  return api.post(`/articles`, data);
-}
-
 export function updateArticle(
   id: string,
   data: { title: string; excerpt?: string; content: object; is_public: boolean }
@@ -92,3 +88,13 @@ export const removeItemFromCollection = async (
 ) => {
   return api.del(`/collections/${collectionId}/items/${itemType}/${itemId}`);
 };
+
+export function createArticle(data: {
+  title: string;
+  excerpt?: string;
+  content: object;
+  cover_image_url?: string;
+}) {
+  console.log(data)
+  return api.post(`/articles`, data);
+}

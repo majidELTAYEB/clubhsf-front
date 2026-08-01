@@ -173,6 +173,8 @@ export const load: PageServerLoad = async ({ fetch, params }) => {
 			Position: item.position
 		}));
 
+		console.log(articles)
+
 	return {
 		collection: {
 			id: collection.id,
