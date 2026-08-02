@@ -185,8 +185,6 @@
 		try {
 			const { data } = await getCollectionItems(collectionId);
 
-            console.log(data)
-
 			videos = data
 				.filter((item: CollectionItem): item is Extract<CollectionItem, { item_type: "video" }> => item.item_type === "video")
 				.map((item) => ({ ...item.video, position: item.position }))

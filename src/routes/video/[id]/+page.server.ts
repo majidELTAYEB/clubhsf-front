@@ -16,7 +16,6 @@ export const load: PageServerLoad = async ({ fetch, params, url }) => {
 
 	const video = await res.json();
 
-	console.log(collectionId)
 
 	let nextVideo = null;
 	if (collectionId) {
