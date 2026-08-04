@@ -1,5 +1,45 @@
 <script lang="ts">
-    import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
+    // import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
+    // import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
+    // import videojs from 'video.js';
+    // import 'video.js/dist/video-js.css';
+    // import { onMount, onDestroy } from 'svelte';
+
+    // let { data } = $props();
+    // let video = $derived(data.video);
+    // let nextVideo = $derived(data.nextVideo);
+
+    // let videoEl: HTMLVideoElement;
+    // let player: ReturnType<typeof videojs>;
+
+    // // Dérive le domaine de la pull zone à partir de ThumbnailURL
+    // let pullZoneHost = $derived(
+    //     video?.ThumbnailURL ? new URL(video.ThumbnailURL).hostname : ''
+    // );
+
+    // let hlsUrl = $derived(
+    //     pullZoneHost && video?.BunnyVideoID
+    //         ? `https://${pullZoneHost}/${video.BunnyVideoID}/playlist.m3u8`
+    //         : ''
+    // );
+
+    // onMount(() => {
+    //     if (hlsUrl) {
+    //         player = videojs(videoEl, {
+    //             controls: true,
+    //             fluid: false,
+    //             responsive: true,
+    //             preload: 'metadata',
+    //             poster: video.ThumbnailURL,
+    //             sources: [{
+    //                 src: hlsUrl,
+    //                 type: 'application/x-mpegURL'
+    //             }]
+    //         });
+    //     }
+    // });
+
+        import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
     import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
     import videojs from 'video.js';
     import 'video.js/dist/video-js.css';
@@ -10,9 +50,8 @@
     let nextVideo = $derived(data.nextVideo);
 
     let videoEl: HTMLVideoElement;
-    let player: ReturnType<typeof videojs>;
+    let player: ReturnType<typeof videojs> | undefined;
 
-    // Dérive le domaine de la pull zone à partir de ThumbnailURL
     let pullZoneHost = $derived(
         video?.ThumbnailURL ? new URL(video.ThumbnailURL).hostname : ''
     );
@@ -39,9 +78,31 @@
         }
     });
 
+    // 👇 réagit à chaque changement de vidéo (navigation vers "suivante")
+    $effect(() => {
+        if (!hlsUrl) return;
+
+        if (player) {
+            // player déjà initialisé -> on change juste la source
+            player.poster(video.ThumbnailURL);
+            player.src({ src: hlsUrl, type: 'application/x-mpegURL' });
+        } else if (videoEl) {
+            // pas encore initialisé (premier mount raté / SSR edge case)
+            player = videojs(videoEl, {
+                controls: true,
+                fluid: false,
+                responsive: true,
+                preload: 'metadata',
+                poster: video.ThumbnailURL,
+                sources: [{ src: hlsUrl, type: 'application/x-mpegURL' }]
+            });
+        }
+    });
+
     onDestroy(() => {
         player?.dispose();
     });
+
 
     // Numéro de catalogue — dérivé de l'ID, façon "N° 0142"
     let catalogNumber = $derived(
