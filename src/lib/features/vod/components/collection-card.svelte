@@ -7,6 +7,7 @@
 		slug: string;
 		cover_image_url: string | null;
 		created_at: string;
+		updated_at: string;
 	};
 
 	let { collection, index = 0 }: { collection: Collection; index?: number } = $props();
@@ -26,7 +27,7 @@
 	<div class="collection-card__scrim">
 		<span class="collection-card__eyebrow">Masterclass</span>
 		<h3 class="collection-card__title">{collection.title}</h3>
-		<span class="collection-card__date">{formatRelativeDate(collection.created_at)}</span>
+		<span class="collection-card__date">{formatRelativeDate(collection.updated_at)}</span>
 	</div>
 </a>
 

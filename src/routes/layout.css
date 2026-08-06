@@ -5,6 +5,29 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+	font-size: clamp(14.5px, 13.5px + 0.3vw, 17px);
+}
+ 
+/* ------------------------------------------------------------
+   IMPORTANT : les champs de saisie (input/textarea/select) NE
+   DOIVENT PAS suivre cette échelle. On les a déjà fixés à 16px
+   en dur dans profile-info-editor.svelte pour éviter le zoom
+   automatique d'iOS Safari sur les champs < 16px. Si le rem
+   racine descend sous 16px sur mobile (ce qui est le cas ici,
+   14.5px minimum), un champ en `font-size: 1rem` repasserait
+   sous le seuil et réintroduirait le bug de zoom.
+ 
+   Règle à suivre pour tout nouveau champ de formulaire ajouté
+   à l'app : toujours `font-size: 16px` en dur, jamais en rem,
+   sur input/textarea/select.
+   ------------------------------------------------------------ */
+input,
+textarea,
+select {
+	font-size: max(16px, 1rem);
+}
+
 :root {
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.145 0 0);

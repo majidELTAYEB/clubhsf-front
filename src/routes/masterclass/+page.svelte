@@ -9,6 +9,7 @@
 		cover_image_url: string | null;
 		is_public: boolean;
 		created_at: string;
+		upated_at: string;
 	};
 
 	// Ta fonction `load` (+page.server.ts) doit déjà filtrer is_public = true

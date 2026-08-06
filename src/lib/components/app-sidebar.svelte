@@ -3,11 +3,11 @@
 	import Signal from "@lucide/svelte/icons/signal";
 	import Webcam from "@lucide/svelte/icons/webcam";
 	import Library from "@lucide/svelte/icons/library";
-	import Clapperboard from "@lucide/svelte/icons/clapperboard";
+	import LibraryIcon from "@lucide/svelte/icons/library";
 	import Videotape from "@lucide/svelte/icons/videotape";
 
 	const navMain = [
-		{ title: "Masterclass", url: "/masterclass", icon: Clapperboard, isActive: true },
+		{ title: "Masterclass", url: "/masterclass", icon: LibraryIcon, isActive: true },
 		{ title: "Live", url: "/lives", icon: Webcam, isActive: true },
 		{ title: "Replay Live", url: "/livestreams-replays", icon: Videotape, isActive: true },
 	];
