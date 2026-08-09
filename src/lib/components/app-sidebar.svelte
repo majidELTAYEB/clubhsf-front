@@ -6,12 +6,14 @@
 	import LibraryIcon from "@lucide/svelte/icons/library";
 	import Videotape from "@lucide/svelte/icons/videotape";
 	import Newspaper from "@lucide/svelte/icons/newspaper";
+	import UserRound from "@lucide/svelte/icons/user-round";
 
 	const navMain = [
 		{ title: "Masterclass", url: "/masterclass", icon: LibraryIcon, isActive: true },
 		{ title: "Live", url: "/lives", icon: Webcam, isActive: true },
 		{ title: "Replay Live", url: "/livestreams-replays", icon: Videotape, isActive: true },
 		{ title: "Posts", url: "/community/posts", icon: Newspaper, isActive: true },
+		{ title: "Profil", url: "/profile", icon: UserRound, isActive: true },
 	];
 
 	const navSecondary = [
