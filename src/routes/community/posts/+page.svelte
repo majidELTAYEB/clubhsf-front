@@ -339,6 +339,11 @@
 	}
 
 	.modal {
+		--bg: #ffffff;
+		--fg: #121210;
+		--muted: #77746c;
+		--border: #e6e3db;
+
 		width: 100%;
 		max-width: 100%;
 		max-height: 88vh;
