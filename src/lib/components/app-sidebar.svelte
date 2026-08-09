@@ -5,11 +5,13 @@
 	import Library from "@lucide/svelte/icons/library";
 	import LibraryIcon from "@lucide/svelte/icons/library";
 	import Videotape from "@lucide/svelte/icons/videotape";
+	import Newspaper from "@lucide/svelte/icons/newspaper";
 
 	const navMain = [
 		{ title: "Masterclass", url: "/masterclass", icon: LibraryIcon, isActive: true },
 		{ title: "Live", url: "/lives", icon: Webcam, isActive: true },
 		{ title: "Replay Live", url: "/livestreams-replays", icon: Videotape, isActive: true },
+		{ title: "Posts", url: "/community/posts", icon: Newspaper, isActive: true },
 	];
 
 	const navSecondary = [
