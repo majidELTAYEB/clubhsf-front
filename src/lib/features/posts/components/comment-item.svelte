@@ -1,6 +1,5 @@
 <!-- src/lib/features/posts/components/comment-item.svelte -->
 <script lang="ts">
-	import Self from './comment-item.svelte';
 	import CommentForm from './comment-form.svelte';
 	import PencilIcon from "@lucide/svelte/icons/pencil";
 	import Trash2Icon from "@lucide/svelte/icons/trash-2";
@@ -146,7 +145,7 @@
 	{#if showReplies && replies.length > 0}
 		<div class="comment__replies">
 			{#each replies as reply (reply.id)}
-				<Self {postId} comment={reply} onDeleted={() => (replies = replies.filter((r) => r.id !== reply.id))} />
+				<svelte:self {postId} comment={reply} onDeleted={() => (replies = replies.filter((r) => r.id !== reply.id))} />
 			{/each}
 		</div>
 	{/if}
@@ -154,6 +153,7 @@
 
 <style>
 	.comment {
+		--bg: #ffffff;
 		--fg: #121210;
 		--muted: #77746c;
 		--border: #e6e3db;
@@ -212,6 +212,7 @@
 		box-sizing: border-box;
 		padding: 0.5rem 0.65rem;
 		border: 1px solid var(--border);
+		background: var(--bg);
 		font-family: 'Inter', sans-serif;
 		font-size: 16px;
 		color: var(--fg);

@@ -95,7 +95,7 @@
 
 <div class="archive">
 	<div class="masthead">
-		<a href="/posts" class="back-link">
+		<a href="/community/posts" class="back-link">
 			<ArrowLeftIcon size={13} strokeWidth={1.75} />
 			<span>Fil</span>
 		</a>

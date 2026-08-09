@@ -149,6 +149,7 @@
 
 <style>
 	.post-form {
+		--bg: #ffffff;
 		--fg: #121210;
 		--muted: #77746c;
 		--border: #e6e3db;
@@ -169,6 +170,7 @@
 		box-sizing: border-box;
 		padding: 0.6rem 0.75rem;
 		border: 1px solid var(--border);
+		background: var(--bg);
 		font-family: 'Inter', sans-serif;
 		font-size: 16px;
 		color: var(--fg);

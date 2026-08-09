@@ -92,13 +92,13 @@
 		{/if}
 	</header>
 
-	<h3 class="post-card__title">{post.title}</h3>
+	<a href={`/community/posts/${post.id}`} class="post-card__title">{post.title}</a>
 	<p class="post-card__content">{post.content}</p>
 
 	{#if post.cover_image_url}
-		<div class="post-card__cover">
+		<a href={`/community/posts/${post.id}`} class="post-card__cover">
 			<img src={post.cover_image_url} alt={post.title} loading="lazy" />
-		</div>
+		</a>
 	{/if}
 
 	<footer class="post-card__footer">
@@ -106,10 +106,10 @@
 			<HeartIcon size={15} strokeWidth={1.75} fill={liked ? 'currentColor' : 'none'} />
 			<span>{likesCount}</span>
 		</button>
-		<span class="post-card__stat">
+		<a href={`/community/posts/${post.id}`} class="post-card__stat">
 			<MessageCircleIcon size={15} strokeWidth={1.75} />
 			<span>{post.comments_count}</span>
-		</span>
+		</a>
 	</footer>
 
 	{#if showConfirmDelete}
@@ -204,14 +204,17 @@
 	.post-card__actions button:hover { border-color: var(--fg); color: var(--fg); }
 
 	.post-card__title {
+		display: block;
 		font-family: 'Fraunces', serif;
 		font-style: italic;
 		font-weight: 500;
 		font-size: 1.15rem;
 		line-height: 1.3;
 		color: var(--fg);
+		text-decoration: none;
 		margin-bottom: 0.5rem;
 	}
+	.post-card__title:hover { opacity: 0.7; }
 
 	.post-card__content {
 		font-size: 0.88rem;
@@ -221,6 +224,7 @@
 	}
 
 	.post-card__cover {
+		display: block;
 		margin-top: 1rem;
 		aspect-ratio: 16 / 9;
 		overflow: hidden;
@@ -249,6 +253,7 @@
 		border: none;
 		padding: 0;
 		color: var(--muted);
+		text-decoration: none;
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.75rem;
 		cursor: pointer;
