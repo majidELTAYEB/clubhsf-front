@@ -12,6 +12,12 @@ Sentry.init({
 
 	environment: dev ? 'development' : 'production',
 
+	tracePropagationTargets: [
+	/^\//,
+	'http://localhost:8080',
+	'https://api.hackersonfutur.fr',
+],
+
 	// This sets the sample rate to be 10%. You may want this to be 100% while
 	// in development and sample at a lower rate in production
 	replaysSessionSampleRate: 0.1,
