@@ -92,22 +92,28 @@
 	import SidebarTriggerResponsive from "$lib/components/sidebar-trigger-responsive.svelte";
 	import MobileBottomNav from "$lib/components/mobile-bottom-nav.svelte";
 	import CreateMenu from "$lib/components/create-menu.svelte";
+	import NotificationPrompt from "$lib/components/NotificationPrompt.svelte";
 
 	import './layout.css';
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from "svelte-sonner";
 	import type { LayoutData } from './$types';
 	import type { Snippet } from "svelte";
+	import InstallHint from "$lib/components/InstallHint.svelte";
+
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 
 	let isAuthenticated = $derived(data.user !== null);
 	let hasFullAccess = $derived(data.user?.hasFullAccess === true);
+
+
 </script>
 
 {#if isAuthenticated}
 	<Toaster position="top-center" richColors/>
+
 
 	{#if hasFullAccess}
 		<Sidebar.Provider open={data.sidebarOpen} isMobileGuess={data.isMobileGuess}>
@@ -128,7 +134,11 @@
 					{/if}
 
 				<div class="mobile-content-pad">
+				<!-- <InstallPWA /> -->
+				<!-- <NotificationPrompt /> -->
+				<InstallHint />
 					{@render children()}
+						
 				</div>
 			</Sidebar.Inset>
 		</Sidebar.Provider>
