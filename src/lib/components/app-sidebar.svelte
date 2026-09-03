@@ -7,6 +7,7 @@
 	import Videotape from "@lucide/svelte/icons/videotape";
 	import Newspaper from "@lucide/svelte/icons/newspaper";
 	import UserRound from "@lucide/svelte/icons/user-round";
+	import Logo from "$lib/assets/logo.jpeg"
 
 	const navMain = [
 		{ title: "Masterclass", url: "/masterclass", icon: LibraryIcon, isActive: true },
@@ -54,7 +55,9 @@
 					<Sidebar.MenuButton size="lg" class="sidebar-brand">
 						{#snippet child({ props })}
 							<a href="/masterclass" {...props}>
-								<div class="sidebar-brand__mark">HSF</div>
+								<div class="sidebar-brand__mark">
+									<img src={Logo} alt="Logo" class="w-full h-full object-cover" />
+								</div>
 								<div class="grid flex-1 text-start leading-tight">
 									<span class="sidebar-brand__name">Hacker son futur</span>
 									<span class="sidebar-brand__author">Franck Lahoui</span>
