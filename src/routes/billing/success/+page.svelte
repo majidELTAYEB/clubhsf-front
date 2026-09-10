@@ -99,9 +99,13 @@
 	}
 
 	.masthead {
-		padding: 1rem 1.5rem;
-		border-bottom: 1px solid var(--border);
-	}
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.5rem;
+  padding-top: calc(1rem + env(safe-area-inset-top));
+  border-bottom: 1px solid var(--border);
+}
 
 	.masthead__eyebrow {
 		font-size: 0.68rem;

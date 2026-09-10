@@ -301,6 +301,7 @@
 		justify-content: space-between;
 		background: var(--bg);
 		border-bottom: 1px solid var(--border);
+		padding-top: env(safe-area-inset-top);
 	}
 
 	.navbar__left {
