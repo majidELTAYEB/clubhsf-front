@@ -34,11 +34,6 @@ export default defineConfig({
             project: 'javascript-sveltekit'
         }),
         tailwindcss(),
-        sveltekit({
-            compilerOptions: {
-                runes: ({ filename }) =>
-                    filename.split(/[/\\]/).includes('node_modules') ? undefined : true
-            }
-        }),
+        sveltekit(),
     ],
 });
