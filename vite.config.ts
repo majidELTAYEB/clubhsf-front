@@ -17,6 +17,9 @@ export default defineConfig({
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
 			adapter: adapter()
-		})
-	]
+		}),
+	],
+	 server: {
+    allowedHosts: ['hierologic-overtart-sid.ngrok-free.dev'],
+  },
 });
