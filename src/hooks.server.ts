@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/sveltekit';
 import type { Handle } from '@sveltejs/kit';
 import { AUTH0_TOKEN_URL, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } from '$lib/config/auth0.config';
 import type { AuthUser, TokenSet, UserProfile } from '$lib/features/auth/types';
+import { env } from 'process';
 
 function decodeJwt<T>(token: string): T {
 	const payload = token.split('.')[1];
@@ -91,6 +92,20 @@ export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, re
 					maxAge: 60 * 60 * 24 * 30
 				});
 			}
+			try {
+		const meRes = await fetch(`${env.BACKEND_URL}/me`, {
+			headers: { Authorization: `Bearer ${tokens.access_token}` }
+		});
+		if (meRes.ok) {
+			const me = await meRes.json();
+			event.cookies.set('user_profile', JSON.stringify(me), {
+				...secureCookie,
+				maxAge: 60 * 60 * 24 * 30
+			});
+		}
+	} catch (err) {
+		console.error('Failed to refresh user profile:', err);
+	}
 		} else {
 			event.cookies.delete('access_token', { path: '/' });
 			event.cookies.delete('id_token', { path: '/' });

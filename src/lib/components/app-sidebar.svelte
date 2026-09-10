@@ -24,6 +24,7 @@
 	const admin = [
 		{ name: "Configuration Live", url: "/admin/lives", icon: Signal },
 		{ name: "Configuration Collections", url: "/admin/collections", icon: Library },
+		{ name: "Membres", url: "/admin/members", icon: UserRound },
 	];
 </script>
 

@@ -8,6 +8,11 @@
 html {
 	font-size: clamp(14.5px, 13.5px + 0.3vw, 17px);
 }
+
+html, body {
+  height: 100%;
+  min-height: 100dvh;
+}
  
 /* ------------------------------------------------------------
    IMPORTANT : les champs de saisie (input/textarea/select) NE
