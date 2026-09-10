@@ -1,6 +1,6 @@
-import type { CollectionResponse } from "./types";
+import type { MembersResponse } from "./types";
 import { api } from "$lib/services/api";
 
-export function getCollection() {
-  return api.get<CollectionResponse>(`/users/members`);
+export function getMembers(params: URLSearchParams) {
+  return api.get<MembersResponse>(`/users/members?${params.toString()}`);
 }

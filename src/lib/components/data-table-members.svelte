@@ -63,7 +63,6 @@
         getFacetedRowModel,
         getFacetedUniqueValues,
         getFilteredRowModel,
-        getPaginationRowModel,
         getSortedRowModel,
         type ColumnFiltersState,
         type PaginationState,
@@ -84,7 +83,7 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import { Badge } from "$lib/components/ui/badge/index.js";
     import { Checkbox } from "$lib/components/ui/checkbox/index.js";
-    import { Input } from "$lib/components/ui/input/index.js";
+    import { Spinner } from "$lib/components/ui/spinner";
 
     // Icons
     import LayoutColumnsIcon from "@tabler/icons-svelte/icons/layout-columns";
@@ -95,9 +94,7 @@
     import ChevronsRightIcon from "@tabler/icons-svelte/icons/chevrons-right";
     import DotsIcon from "@tabler/icons-svelte/icons/dots";
     import CopyIcon from "@tabler/icons-svelte/icons/copy";
-    import UserIcon from "@tabler/icons-svelte/icons/user";
     import SettingsIcon from "@tabler/icons-svelte/icons/settings";
-    import SearchIcon from "@tabler/icons-svelte/icons/search";
     import ExternalLinkIcon from "@tabler/icons-svelte/icons/external-link";
 
     // Navigation
@@ -108,14 +105,37 @@
     // import { updateMember } from "$lib/features/admin-member/api";
 
     // 3. Réception des données
-    let { data }: { data: Member[] } = $props();
+    // La pagination est gérée côté serveur (limit/offset) : ce composant reçoit
+    // uniquement LA page courante + les métadonnées, et notifie le parent des
+    // changements via onPaginationChange.
+    let {
+        data,
+        total = 0,
+        limit = 10,
+        offset = 0,
+        isLoading = false,
+        onPaginationChange,
+    }: {
+        data: Member[];
+        total?: number;
+        limit?: number;
+        offset?: number;
+        isLoading?: boolean;
+        onPaginationChange?: (limit: number, offset: number) => void;
+    } = $props();
 
-    let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
     let sorting = $state<SortingState>([]);
     let columnFilters = $state<ColumnFiltersState>([]);
     let rowSelection = $state<RowSelectionState>({});
     let columnVisibility = $state<VisibilityState>({});
-    let globalFilter = $state("");
+
+    // Dérivés de limit/offset fournis par le parent (source de vérité = l'URL/l'API)
+    let pageIndex = $derived(limit > 0 ? Math.floor(offset / limit) : 0);
+    let pageCount = $derived(Math.max(1, Math.ceil(total / Math.max(limit, 1))));
+
+    function emitPagination(next: PaginationState) {
+        onPaginationChange?.(next.pageSize, next.pageIndex * next.pageSize);
+    }
 
     const table = createSvelteTable({
         get data() {
@@ -123,7 +143,7 @@
         },
         columns,
         state: {
-            get pagination() { return pagination; },
+            get pagination() { return { pageIndex, pageSize: limit }; },
             get sorting() { return sorting; },
             get columnVisibility() { return columnVisibility; },
             get rowSelection() { return rowSelection; },
@@ -131,40 +151,23 @@
         },
         getRowId: (row) => row.id,
         enableRowSelection: true,
-        autoResetPageIndex: false,
+        manualPagination: true,
+        get pageCount() { return pageCount; },
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
         getFilteredRowModel: getFilteredRowModel(),
-        onPaginationChange: (updater) => { pagination = typeof updater === "function" ? updater(pagination) : updater; },
+        onPaginationChange: (updater) => {
+            const current = { pageIndex, pageSize: limit };
+            const next = typeof updater === "function" ? updater(current) : updater;
+            emitPagination(next);
+        },
         onSortingChange: (updater) => { sorting = typeof updater === "function" ? updater(sorting) : updater; },
         onColumnFiltersChange: (updater) => { columnFilters = typeof updater === "function" ? updater(columnFilters) : updater; },
         onColumnVisibilityChange: (updater) => { columnVisibility = typeof updater === "function" ? updater(columnVisibility) : updater; },
         onRowSelectionChange: (updater) => { rowSelection = typeof updater === "function" ? updater(rowSelection) : updater; },
     });
-
-    // 4. Onglets, calculés dynamiquement à partir des données reçues
-    let views = $derived([
-        { id: "all", label: "Tous les membres", badge: 0 },
-        { id: "active", label: "Abonnés actifs", badge: data.filter((m) => m.subscription?.status === "active").length },
-        { id: "canceled", label: "Résiliés", badge: data.filter((m) => m.subscription && m.subscription.status !== "active").length },
-        { id: "none", label: "Sans abonnement", badge: data.filter((m) => !m.subscription).length },
-        { id: "admin", label: "Admins", badge: data.filter((m) => m.role === "admin").length },
-    ]);
-
-    let view = $state("all");
-    let viewLabel = $derived(views.find((v) => view === v.id)?.label ?? "Sélectionner une vue");
-
-    function matchesSearch(member: Member, query: string) {
-        const q = query.trim().toLowerCase();
-        if (q === "") return true;
-        return (
-            member.email.toLowerCase().includes(q) ||
-            (member.full_name ?? "").toLowerCase().includes(q)
-        );
-    }
 
     function formatDate(dateStr?: string | null) {
         if (!dateStr) return "—";
@@ -231,40 +234,16 @@
     }
 </script>
 
-<Tabs.Root value="all" class="w-full flex-col justify-start gap-6 py-4">
+<div class="w-full flex flex-col justify-start gap-6 py-4">
     <div class="flex items-center justify-between px-4 lg:px-6">
-        <Label for="view-selector" class="sr-only">Vue</Label>
-        <Select.Root type="single" bind:value={view}>
-            <Select.Trigger class="flex w-fit @4xl/main:hidden" size="sm" id="view-selector">
-                {viewLabel}
-            </Select.Trigger>
-            <Select.Content>
-                {#each views as view (view.id)}
-                    <Select.Item value={view.id}>{view.label}</Select.Item>
-                {/each}
-            </Select.Content>
-        </Select.Root>
-
-        <Tabs.List class="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-            {#each views as view (view.id)}
-                <Tabs.Trigger value={view.id}>
-                    {view.label}
-                    {#if view.badge > 0}
-                        <Badge variant="secondary" class="ml-2">{view.badge}</Badge>
-                    {/if}
-                </Tabs.Trigger>
-            {/each}
-        </Tabs.List>
+        <div>
+            <h2 class="text-lg font-semibold">Membres</h2>
+            <p class="text-muted-foreground text-sm">
+                {total} membre{total > 1 ? "s" : ""} au total
+            </p>
+        </div>
 
         <div class="flex items-center gap-2">
-            <div class="relative hidden lg:block">
-                <SearchIcon class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                    bind:value={globalFilter}
-                    placeholder="Rechercher un membre..."
-                    class="w-64 pl-8"
-                />
-            </div>
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
                     {#snippet child({ props })}
@@ -291,7 +270,7 @@
         </div>
     </div>
 
-    {#snippet dataTable(rows: Row<Member>[])}
+    <div class="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
         <div class="overflow-hidden rounded-lg border">
             <Table.Root>
                 <Table.Header class="bg-muted sticky top-0 z-10">
@@ -319,9 +298,17 @@
                         </Table.Row>
                     {/each}
                 </Table.Header>
-                <Table.Body>
-                    {#if rows.length}
-                        {#each rows as row (row.id)}
+                <Table.Body class="**:data-[slot=table-cell]:first:w-8">
+                    {#if isLoading}
+                        <Table.Row>
+                            <Table.Cell colspan={columns.length} class="h-24 text-center">
+                                <div class="flex items-center justify-center gap-2 text-muted-foreground">
+                                    <Spinner class="size-4" /> Chargement...
+                                </div>
+                            </Table.Cell>
+                        </Table.Row>
+                    {:else if table.getRowModel().rows.length}
+                        {#each table.getRowModel().rows as row (row.id)}
                             {@render MemberRow({ row })}
                         {/each}
                     {:else}
@@ -335,24 +322,22 @@
             </Table.Root>
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination serveur (limit/offset) -->
         <div class="flex items-center justify-between px-4">
             <div class="text-muted-foreground hidden flex-1 text-sm lg:flex">
                 {table.getFilteredSelectedRowModel().rows.length} sur
-                {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
+                {data.length} ligne(s) sélectionnée(s) sur cette page.
             </div>
             <div class="flex w-full items-center gap-8 lg:w-fit">
                 <div class="hidden items-center gap-2 lg:flex">
                     <Label for="rows-per-page" class="text-sm font-medium">Lignes par page</Label>
                     <Select.Root
                         type="single"
-                        bind:value={
-                            () => `${table.getState().pagination.pageSize}`,
-                            (v) => table.setPageSize(Number(v))
-                        }
+                        value={`${limit}`}
+                        onValueChange={(v) => onPaginationChange?.(Number(v), 0)}
                     >
                         <Select.Trigger size="sm" class="w-20" id="rows-per-page">
-                            {table.getState().pagination.pageSize}
+                            {limit}
                         </Select.Trigger>
                         <Select.Content side="top">
                             {#each [10, 20, 30, 40, 50] as pageSize (pageSize)}
@@ -364,56 +349,58 @@
                     </Select.Root>
                 </div>
                 <div class="flex w-fit items-center justify-center text-sm font-medium">
-                    Page {table.getState().pagination.pageIndex + 1} sur {table.getPageCount()}
+                    Page {pageIndex + 1} sur {pageCount}
                 </div>
                 <div class="ms-auto flex items-center gap-2 lg:ms-0">
-                    <Button variant="outline" class="hidden h-8 w-8 p-0 lg:flex" onclick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>
+                    <Button
+                        variant="outline"
+                        class="hidden h-8 w-8 p-0 lg:flex"
+                        onclick={() => onPaginationChange?.(limit, 0)}
+                        disabled={pageIndex === 0}
+                    >
                         <span class="sr-only">Première page</span>
                         <ChevronsLeftIcon class="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" class="size-8" size="icon" onclick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+                    <Button
+                        variant="outline"
+                        class="size-8"
+                        size="icon"
+                        onclick={() => onPaginationChange?.(limit, Math.max(0, offset - limit))}
+                        disabled={pageIndex === 0}
+                    >
                         <span class="sr-only">Page précédente</span>
                         <ChevronLeftIcon class="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" class="size-8" size="icon" onclick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+                    <Button
+                        variant="outline"
+                        class="size-8"
+                        size="icon"
+                        onclick={() => onPaginationChange?.(limit, offset + limit)}
+                        disabled={pageIndex + 1 >= pageCount}
+                    >
                         <span class="sr-only">Page suivante</span>
                         <ChevronRightIcon class="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" class="hidden size-8 lg:flex" size="icon" onclick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}>
+                    <Button
+                        variant="outline"
+                        class="hidden size-8 lg:flex"
+                        size="icon"
+                        onclick={() => onPaginationChange?.(limit, (pageCount - 1) * limit)}
+                        disabled={pageIndex + 1 >= pageCount}
+                    >
                         <span class="sr-only">Dernière page</span>
                         <ChevronsRightIcon class="h-4 w-4" />
                     </Button>
                 </div>
             </div>
         </div>
-    {/snippet}
-
-    <Tabs.Content value="all" class="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-        {@render dataTable(table.getRowModel().rows.filter((r) => matchesSearch(r.original, globalFilter)))}
-    </Tabs.Content>
-
-    <Tabs.Content value="active" class="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-        {@render dataTable(table.getRowModel().rows.filter((r) => r.original.subscription?.status === "active" && matchesSearch(r.original, globalFilter)))}
-    </Tabs.Content>
-
-    <Tabs.Content value="canceled" class="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-        {@render dataTable(table.getRowModel().rows.filter((r) => r.original.subscription && r.original.subscription.status !== "active" && matchesSearch(r.original, globalFilter)))}
-    </Tabs.Content>
-
-    <Tabs.Content value="none" class="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-        {@render dataTable(table.getRowModel().rows.filter((r) => !r.original.subscription && matchesSearch(r.original, globalFilter)))}
-    </Tabs.Content>
-
-    <Tabs.Content value="admin" class="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-        {@render dataTable(table.getRowModel().rows.filter((r) => r.original.role === "admin" && matchesSearch(r.original, globalFilter)))}
-    </Tabs.Content>
-</Tabs.Root>
+    </div>
+</div>
 
 {#snippet MemberRow({ row }: { row: Row<Member> })}
     <Table.Row
         data-state={row.getIsSelected() && "selected"}
         class="cursor-pointer"
-        onclick={() => goToMember(row.original)}
     >
         {#each row.getVisibleCells() as cell (cell.id)}
             <Table.Cell onclick={(e) => {
@@ -469,7 +456,7 @@
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Content align="end" class="w-52">
                             <DropdownMenu.Label>Actions</DropdownMenu.Label>
-                            <DropdownMenu.Item onclick={() => goToMember(row.original)}>
+                            <DropdownMenu.Item >
                                 <SettingsIcon class="mr-2 h-3.5 w-3.5" />
                                 Voir le profil
                             </DropdownMenu.Item>
