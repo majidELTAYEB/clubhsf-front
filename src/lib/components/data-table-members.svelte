@@ -114,14 +114,18 @@
         limit = 10,
         offset = 0,
         isLoading = false,
+        hasSubscription = false,
         onPaginationChange,
+        onFilterChange,
     }: {
         data: Member[];
         total?: number;
         limit?: number;
         offset?: number;
         isLoading?: boolean;
+        hasSubscription?: boolean;
         onPaginationChange?: (limit: number, offset: number) => void;
+        onFilterChange?: (hasSubscription: boolean) => void;
     } = $props();
 
     let sorting = $state<SortingState>([]);
@@ -244,6 +248,16 @@
         </div>
 
         <div class="flex items-center gap-2">
+            <Tabs.Root
+                value={hasSubscription ? "with-subscription" : "all"}
+                onValueChange={(v) => onFilterChange?.(v === "with-subscription")}
+            >
+                <Tabs.List>
+                    <Tabs.Trigger value="all">Tous</Tabs.Trigger>
+                    <Tabs.Trigger value="with-subscription">Avec abonnement</Tabs.Trigger>
+                </Tabs.List>
+            </Tabs.Root>
+
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
                     {#snippet child({ props })}
