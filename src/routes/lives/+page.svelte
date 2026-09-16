@@ -232,6 +232,7 @@
 	import type { PageData } from './$types';
 	import LiveCard from '$lib/components/live-card.svelte';
 	import NotificationPrompt from '$lib/components/NotificationPrompt.svelte';
+	import NotificationCenter from '$lib/features/notifications/components/NotificationCenter.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let lives = $derived(data.lives);
@@ -276,13 +277,22 @@
 			minute: '2-digit'
 		});
 	}
+
 </script>
 
 <div class="archive">
-	<div class="masthead">
+	<!-- <div class="masthead">
 		<span class="masthead__eyebrow">Lives</span>
 		<span class="catalog-number">{lives.length} au total</span>
+	</div> -->
+	<div class="masthead">
+	<span class="masthead__eyebrow">Lives</span>
+	<div class="masthead__right">
+		<NotificationCenter />
+
 	</div>
+</div>
+
 
 	<div class="archive__inner">
 		{#if nextLive}
@@ -539,6 +549,13 @@
 		gap: 1px;
 		margin-top: 2.5rem;
 	}
+
+	.masthead__right {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
 
 	@media (min-width: 640px) {
 		.live-grid { grid-template-columns: repeat(2, 1fr); }

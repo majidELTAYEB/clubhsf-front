@@ -365,12 +365,6 @@
 	let totalDuration = $derived(data.videos.reduce((sum, v) => sum + v.DurationSeconds, 0));
 
 	// Numéro de catalogue — façon "N° 0142"
-	let catalogNumber = $derived(
-		String(data.collection?.id ?? 0)
-			.replace(/\D/g, '')
-			.slice(-4)
-			.padStart(4, '0')
-	);
 </script>
 
 <svelte:head>
@@ -384,7 +378,6 @@
 			<span>Toutes les masterclass</span>
 		</a>
 		<span class="masthead__category">Collection</span>
-		<span class="catalog-number">N&deg; {catalogNumber}</span>
 	</div>
 
 	<div class="archive__inner">
