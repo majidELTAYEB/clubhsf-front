@@ -7,6 +7,7 @@
 	import type { Post } from '$lib/features/posts/types';
 	import PostCard from '$lib/features/posts/components/post-card.svelte';
 	import PostForm from '$lib/features/posts/components/post-form.svelte';
+	import NotificationPrompt from '$lib/components/NotificationPrompt.svelte';
 
 	let posts = $state<Post[]>([]);
 	let nextCursor = $state<string | undefined>(undefined);
@@ -118,6 +119,7 @@
 			<h1 class="title">Le fil</h1>
 			<p class="subtitle">Ce que la communauté partage, en direct.</p>
 		</header>
+		<NotificationPrompt variant="banner" />
 
 		{#if loading}
 			<div class="feed-list">
