@@ -167,7 +167,11 @@
 
 	// 'banner'  -> bloc explicatif avec CTA, à mettre en haut du fil / des écrans clés
 	// 'compact' -> icône seule, pour le header (comportement d'origine)
-	let { variant = 'banner' }: { variant?: 'banner' | 'compact' } = $props();
+	let {
+		variant = 'banner',
+		title = 'Ne rate aucun live ni article',
+		text = 'Active les notifications pour être prévenu à chaque nouveau contenu.'
+	}: { variant?: 'banner' | 'compact'; title?: string; text?: string } = $props();
 
 	let eligibility = $state<PushEligibility>('unsupported');
 	let subscribing = $state(false);
@@ -252,10 +256,8 @@
 				<BellIcon size={18} strokeWidth={1.75} />
 			</div>
 			<div class="notif-banner__content">
-				<p class="notif-banner__title">Ne rate aucun live ni article</p>
-				<p class="notif-banner__text">
-					Active les notifications pour être prévenu à chaque nouveau contenu.
-				</p>
+				<p class="notif-banner__title">{title}</p>
+				<p class="notif-banner__text">{text}</p>
 				{#if error}
 					<p class="notif-error">{error}</p>
 				{/if}
@@ -323,10 +325,14 @@
 {/if}
 
 <style>
+	/*
+	 * Palette et typo calées sur le reste de l'app :
+	 * --fg / --muted / --border / --accent identiques aux pages Posts et Lives.
+	 * Fraunces italic pour les titres, Inter pour le corps, aucun border-radius.
+	 */
 	.notif-btn {
 		--fg: #121210;
-		--muted: #77746c;
-		--border: #e6e3db;
+		--border-fg: #121210;
 
 		display: inline-flex;
 		align-items: center;
@@ -334,10 +340,10 @@
 		padding: 0.55rem 0.9rem;
 		background: var(--fg);
 		color: #fff;
-		border: 1px solid var(--border);
+		border: 1px solid var(--border-fg);
 		font-family: 'Inter', sans-serif;
 		font-size: 0.75rem;
-		font-weight: 600;
+		font-weight: 500;
 		cursor: pointer;
 		white-space: nowrap;
 	}
@@ -354,6 +360,7 @@
 	.notif-btn.compact {
 		background: none;
 		color: #121210;
+		border: 1px solid transparent;
 		padding: 0.4rem;
 	}
 
@@ -372,9 +379,9 @@
 	.notif-banner {
 		display: flex;
 		align-items: flex-start;
-		gap: 0.85rem;
-		padding: 0.9rem 1rem;
-		background: #f7f5f0;
+		gap: 0.9rem;
+		padding: 1.1rem 1.25rem;
+		background: #ffffff;
 		border: 1px solid #e6e3db;
 		font-family: 'Inter', sans-serif;
 	}
@@ -382,7 +389,7 @@
 	.notif-banner__icon {
 		flex-shrink: 0;
 		color: #121210;
-		margin-top: 0.15rem;
+		margin-top: 0.2rem;
 	}
 
 	.notif-banner__content {
@@ -391,17 +398,20 @@
 	}
 
 	.notif-banner__title {
-		font-size: 0.85rem;
-		font-weight: 600;
+		font-family: 'Fraunces', serif;
+		font-style: italic;
+		font-weight: 500;
+		font-size: 1.05rem;
+		line-height: 1.25;
 		color: #121210;
-		margin: 0 0 0.2rem;
+		margin: 0 0 0.3rem;
 	}
 
 	.notif-banner__text {
-		font-size: 0.78rem;
+		font-size: 0.8rem;
 		color: #77746c;
 		margin: 0;
-		line-height: 1.4;
+		line-height: 1.45;
 	}
 
 	.notif-banner__actions {
@@ -417,6 +427,7 @@
 		color: #77746c;
 		cursor: pointer;
 		padding: 0.3rem;
+		margin: -0.3rem;
 		display: inline-flex;
 	}
 
@@ -425,17 +436,17 @@
 	}
 
 	.notif-error {
-		margin-top: 0.4rem;
+		margin-top: 0.5rem;
 		font-size: 0.72rem;
 		color: #b23a1f;
 	}
 
 	.ios-steps {
-		margin: 0.4rem 0 0;
+		margin: 0.5rem 0 0;
 		padding-left: 1.1rem;
-		font-size: 0.78rem;
+		font-size: 0.8rem;
 		color: #77746c;
-		line-height: 1.5;
+		line-height: 1.55;
 	}
 
 	.ios-steps strong {
