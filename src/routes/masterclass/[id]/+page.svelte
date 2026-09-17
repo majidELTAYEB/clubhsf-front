@@ -364,7 +364,6 @@
 
 	let totalDuration = $derived(data.videos.reduce((sum, v) => sum + v.DurationSeconds, 0));
 
-	// Numéro de catalogue — façon "N° 0142"
 </script>
 
 <svelte:head>
