@@ -1,6 +1,7 @@
 <script lang="ts">
 	import GraduationCap from '@lucide/svelte/icons/graduation-cap';
 	import CollectionCard from '$lib/features/vod/components/collection-card.svelte';
+	import NotificationCenter from '$lib/features/notifications/components/NotificationCenter.svelte';
 
 	type Collection = {
 		id: string;
@@ -19,6 +20,10 @@
 
 <svelte:head>
 	<title>Masterclass</title>
+		<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 </svelte:head>
 
 <div class="archive">

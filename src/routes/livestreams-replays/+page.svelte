@@ -1,4 +1,5 @@
 <script lang="ts">
+	import NotificationCenter from "$lib/features/notifications/components/NotificationCenter.svelte";
 	import PlayIcon from "@lucide/svelte/icons/play";
 
 	type Live = {
@@ -31,6 +32,10 @@
 	<div class="masthead">
 		<span class="masthead__eyebrow">Replays</span>
 		<span class="catalog-number">{data.replays.length} live{data.replays.length > 1 ? 's' : ''} enregistré{data.replays.length > 1 ? 's' : ''}</span>
+			<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 	</div>
 
 	<div class="archive__inner">

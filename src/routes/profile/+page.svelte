@@ -10,6 +10,7 @@
 	import ProfileInfoEditor from '$lib/features/profile/components/profile-info-editor.svelte';
 	import ProfileGoalsEditor from '$lib/features/profile/components/profile-goals-editor.svelte';
 	import NotificationPrompt from "$lib/components/NotificationPrompt.svelte";
+	import NotificationCenter from "$lib/features/notifications/components/NotificationCenter.svelte";
 
 	let profile = $state<Profile | null>(null);
 	let goalsCatalog = $state<Goal[]>([]);
@@ -89,6 +90,10 @@
 <div class="archive">
 	<div class="masthead">
 		<span class="masthead__eyebrow">Profil</span>
+			<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 	</div>
 
 	{#if loading}

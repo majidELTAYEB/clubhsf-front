@@ -2,6 +2,7 @@
 <script lang="ts">
 	import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
 	import LivePlayer from '$lib/components/live-player.svelte';
+	import NotificationCenter from "$lib/features/notifications/components/NotificationCenter.svelte";
 
 	type Live = {
 		id: string;
@@ -31,6 +32,10 @@
 			<span>Replays</span>
 		</a>
 		<span class="masthead__category">Replay</span>
+			<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 	</div>
 
 	<div class="archive__inner">

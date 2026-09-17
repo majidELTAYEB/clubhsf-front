@@ -281,10 +281,6 @@
 </script>
 
 <div class="archive">
-	<!-- <div class="masthead">
-		<span class="masthead__eyebrow">Lives</span>
-		<span class="catalog-number">{lives.length} au total</span>
-	</div> -->
 	<div class="masthead">
 	<span class="masthead__eyebrow">Lives</span>
 	<div class="masthead__right">

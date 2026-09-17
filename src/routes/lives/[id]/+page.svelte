@@ -11,6 +11,7 @@
 	import LiveChat from '$lib/components/live-chat.svelte';
 	import { useLiveChat } from '$lib/hooks/use-live-chat.svelte';
 	import { useViewerCount } from '$lib/hooks/use-viewer-count.svelte';
+	import NotificationCenter from '$lib/features/notifications/components/NotificationCenter.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let live = $derived(data.live);
@@ -93,6 +94,10 @@
 			</span>
 			<span class="catalog-number">{viewerCount.count} spectateur{viewerCount.count > 1 ? 's' : ''}</span>
 		{/if}
+			<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 	</div>
 
 	<div class="archive__inner">

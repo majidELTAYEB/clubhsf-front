@@ -8,6 +8,7 @@
 	import type { Post, Comment } from '$lib/features/posts/types';
 	import CommentForm from '$lib/features/posts/components/comment-form.svelte';
 	import CommentItem from '$lib/features/posts/components/comment-item.svelte';
+	import NotificationCenter from '$lib/features/notifications/components/NotificationCenter.svelte';
 
 	let postId = $derived(page.params.id);
 
@@ -99,6 +100,10 @@
 			<ArrowLeftIcon size={13} strokeWidth={1.75} />
 			<span>Fil</span>
 		</a>
+			<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 	</div>
 
 	<div class="archive__inner">

@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import CollectionCard from '$lib/components/collection-card.svelte';
 	import TabsComp from '$lib/components/tabs-comp.svelte';
+	import NotificationCenter from '$lib/features/notifications/components/NotificationCenter.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let collections = $derived(data.collections);
@@ -14,6 +15,10 @@
 <div class="mx-auto w-full space-y-6 p-6">
 	<div class="flex items-center justify-between">
 		<h1 class="text-2xl font-semibold tracking-tight">Collections</h1>
+			<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 		
 	</div>
 

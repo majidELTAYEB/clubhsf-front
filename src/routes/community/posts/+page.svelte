@@ -8,6 +8,7 @@
 	import PostCard from '$lib/features/posts/components/post-card.svelte';
 	import PostForm from '$lib/features/posts/components/post-form.svelte';
 	import NotificationPrompt from '$lib/components/NotificationPrompt.svelte';
+	import NotificationCenter from '$lib/features/notifications/components/NotificationCenter.svelte';
 
 	let posts = $state<Post[]>([]);
 	let nextCursor = $state<string | undefined>(undefined);
@@ -112,6 +113,10 @@
 			<PlusIcon size={13} strokeWidth={2} />
 			<span>Nouveau post</span>
 		</button>
+			<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 	</div>
 
 	<div class="archive__inner">

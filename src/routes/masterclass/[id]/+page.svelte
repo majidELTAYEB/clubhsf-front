@@ -332,6 +332,7 @@
 	import Play from '@lucide/svelte/icons/play';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import { formatDuration, formatTotalDuration } from '$lib/utils/masterclass';
+	import NotificationCenter from '$lib/features/notifications/components/NotificationCenter.svelte';
 
 	type Video = {
 		ID: string;
@@ -377,6 +378,10 @@
 			<span>Toutes les masterclass</span>
 		</a>
 		<span class="masthead__category">Collection</span>
+			<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 	</div>
 
 	<div class="archive__inner">

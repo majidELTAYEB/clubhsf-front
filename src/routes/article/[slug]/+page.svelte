@@ -3,6 +3,7 @@
 	import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
 	import TiptapContent from '$lib/components/tiptap-content.svelte';
 	import type { TiptapNode } from '$lib/components/tiptap-node.svelte';
+	import NotificationCenter from "$lib/features/notifications/components/NotificationCenter.svelte";
 
 	type Article = {
 		id: string;
@@ -53,6 +54,10 @@
             <ArrowLeftIcon size={13} strokeWidth={1.75} />
             <span>Retour</span>
         </button>
+			<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 	</div>
 
 	<article class="archive__inner">
