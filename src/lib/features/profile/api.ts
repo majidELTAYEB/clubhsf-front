@@ -43,6 +43,10 @@ export function removeSocialLink(platform: string) {
 	return unwrap<void>(api.del(`/profiles/me/social-links/${platform}`));
 }
 
+export function getUserByUsername(username: string) {
+	return unwrap<Profile>(api.get(`/profiles/${username}`));
+}
+
 export function presignImageUpload(kind: 'avatar' | 'cover', filename: string, contentType: string) {
 	return unwrap<PresignResponse>(
 		api.post(`/profiles/me/${kind}/presign`, {
