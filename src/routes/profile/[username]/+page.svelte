@@ -22,7 +22,7 @@
 	}
 
 	$effect(() => {
-		const username = $page.url.searchParams.get('username');
+		const username = $page.params.username ?? $page.url.searchParams.get('username');
 		if (username) {
 			loadProfile(username);
 		} else {

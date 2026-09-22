@@ -74,14 +74,14 @@
 <div class="comment" style={`--depth: ${Math.min(comment.depth, MAX_DEPTH)}`}>
 	<div class="comment__body">
 		<div class="comment__head">
-			<div class="comment__avatar">
+			<a href={`/profile/${comment.author.username}`} class="comment__avatar">
 				{#if comment.author.avatar_url}
 					<img src={comment.author.avatar_url} alt={comment.author.username} />
 				{:else}
 					<span>{comment.author.username.slice(0, 2).toUpperCase()}</span>
 				{/if}
-			</div>
-			<span class="comment__username">{comment.author.username}</span>
+			</a>
+			<a href={`/profile/${comment.author.username}`} class="comment__username">{comment.author.username}</a>
 			<span class="comment__date">{formatDate(comment.created_at)}</span>
 		</div>
 
@@ -193,6 +193,10 @@
 		font-size: 0.78rem;
 		font-weight: 500;
 		color: var(--fg);
+		text-decoration: none;
+	}
+	.comment__username:hover {
+		text-decoration: underline;
 	}
 	.comment__date {
 		font-family: 'JetBrains Mono', monospace;
