@@ -2,6 +2,8 @@
 	import { goto } from '$app/navigation';
 	import SearchIcon from "@lucide/svelte/icons/search";
 	import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
+	import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
+	import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
 	import XIcon from "@lucide/svelte/icons/x";
 	import { searchProfiles, getGoalsCatalog } from '$lib/features/profile/api';
 	import type { SearchProfile, Goal } from '$lib/features/profile/types';
@@ -13,10 +15,9 @@
 	let results = $state<SearchProfile[]>([]);
 	let total = $state(0);
 	let offset = $state(0);
-	const limit = 20;
+	const limit = 2;
 
 	let loading = $state(false);
-	let loadingMore = $state(false);
 	let searchError = $state<string | null>(null);
 
 	let debounceHandle: ReturnType<typeof setTimeout> | undefined;
@@ -77,10 +78,22 @@
 		runSearch();
 	}
 
+	// runSearch revient toujours a la page 1 (nouveau texte/filtre = nouveau
+	// resultat, l'ancienne position de pagination n'a plus de sens).
 	async function runSearch() {
-		const q = buildQuery();
-		offset = 0;
+		await fetchPage(0);
+	}
 
+	// goToPage remplace le contenu affiche (vraie pagination), contrairement
+	// a un "charger plus" qui aurait accumule les resultats.
+	async function goToPage(page: number) {
+		if (page < 0) return;
+		await fetchPage(page * limit);
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	}
+
+	async function fetchPage(newOffset: number) {
+		const q = buildQuery();
 		const currentRequest = ++requestId;
 		// Pas de "loading = true" qui vide l'ecran : on garde les anciens
 		// resultats affiches jusqu'a ce que les nouveaux arrivent, pour
@@ -89,10 +102,11 @@
 		searchError = null;
 
 		try {
-			const res = await searchProfiles(q, { limit, offset: 0 });
+			const res = await searchProfiles(q, { limit, offset: newOffset });
 			if (currentRequest !== requestId) return; // reponse perimee, ignoree
 			results = res.results;
 			total = res.total;
+			offset = newOffset;
 		} catch (err) {
 			if (currentRequest !== requestId) return;
 			searchError = err instanceof Error ? err.message : 'Impossible de charger les membres';
@@ -101,23 +115,33 @@
 		}
 	}
 
-	async function loadMore() {
-		if (loadingMore || results.length >= total) return;
-
-		loadingMore = true;
-		try {
-			const nextOffset = offset + limit;
-			const res = await searchProfiles(buildQuery(), { limit, offset: nextOffset });
-			results = [...results, ...res.results];
-			offset = nextOffset;
-		} catch {
-			// Échec silencieux sur "charger plus", même logique que le feed posts.
-		} finally {
-			loadingMore = false;
-		}
-	}
-
 	let hasActiveFilters = $derived(query.trim() !== '' || selectedCity !== null || selectedGoal !== null);
+	let currentPage = $derived(Math.floor(offset / limit));
+	let totalPages = $derived(Math.max(1, Math.ceil(total / limit)));
+
+	// Fenetre de pages affichees autour de la page courante (+ premiere et
+	// derniere toujours visibles), avec des trous marques par null.
+	let pageWindow = $derived.by(() => {
+		const pages: (number | null)[] = [];
+		const add = (p: number) => {
+			if (!pages.includes(p)) pages.push(p);
+		};
+
+		add(0);
+		for (let p = currentPage - 1; p <= currentPage + 1; p++) {
+			if (p > 0 && p < totalPages - 1) add(p);
+		}
+		if (totalPages > 1) add(totalPages - 1);
+
+		pages.sort((a, b) => a - b);
+
+		const withGaps: (number | null)[] = [];
+		for (let i = 0; i < pages.length; i++) {
+			if (i > 0 && pages[i] - pages[i - 1] > 1) withGaps.push(null);
+			withGaps.push(pages[i]);
+		}
+		return withGaps;
+	});
 </script>
 
 <svelte:head>
@@ -243,12 +267,45 @@
 				{/each}
 			</div>
 
-			{#if results.length < total}
-				<div class="load-more">
-					<button type="button" onclick={loadMore} disabled={loadingMore}>
-						{loadingMore ? 'Chargement…' : `Charger plus (${results.length}/${total})`}
+			{#if totalPages > 1}
+				<nav class="pagination" aria-label="Pagination des membres">
+					<button
+						type="button"
+						class="pagination__arrow"
+						onclick={() => goToPage(currentPage - 1)}
+						disabled={currentPage === 0 || loading}
+						aria-label="Page précédente"
+					>
+						<ChevronLeftIcon size={16} strokeWidth={2} />
 					</button>
-				</div>
+
+					{#each pageWindow as page, i (i)}
+						{#if page === null}
+							<span class="pagination__ellipsis">…</span>
+						{:else}
+							<button
+								type="button"
+								class="pagination__page"
+								class:pagination__page--active={page === currentPage}
+								onclick={() => goToPage(page)}
+								disabled={loading}
+								aria-current={page === currentPage ? 'page' : undefined}
+							>
+								{page + 1}
+							</button>
+						{/if}
+					{/each}
+
+					<button
+						type="button"
+						class="pagination__arrow"
+						onclick={() => goToPage(currentPage + 1)}
+						disabled={currentPage >= totalPages - 1 || loading}
+						aria-label="Page suivante"
+					>
+						<ChevronRightIcon size={16} strokeWidth={2} />
+					</button>
+				</nav>
 			{/if}
 		{/if}
 	</div>
@@ -504,27 +561,52 @@
 		color: var(--muted);
 	}
 
-	.load-more {
+	.pagination {
 		display: flex;
+		align-items: center;
 		justify-content: center;
+		flex-wrap: wrap;
+		gap: 0.35rem;
 		margin-top: 2rem;
 	}
-	.load-more button {
-		padding: 0.65rem 1.5rem;
+	.pagination__arrow,
+	.pagination__page {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 2.25rem;
+		height: 2.25rem;
+		padding: 0 0.5rem;
 		background: none;
 		border: 1px solid var(--border);
 		color: var(--fg);
+		font-family: 'Inter', sans-serif;
 		font-size: 0.78rem;
 		font-weight: 500;
 		cursor: pointer;
-		transition: border-color 0.2s ease;
+		transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
 	}
-	.load-more button:hover {
+	.pagination__arrow:hover:not(:disabled),
+	.pagination__page:hover:not(:disabled) {
 		border-color: var(--fg);
 	}
-	.load-more button:disabled {
-		opacity: 0.5;
+	.pagination__arrow:disabled {
+		opacity: 0.35;
 		cursor: not-allowed;
+	}
+	.pagination__page--active {
+		background: var(--fg);
+		border-color: var(--fg);
+		color: #fff;
+	}
+	.pagination__ellipsis {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.5rem;
+		height: 2.25rem;
+		color: var(--muted);
+		font-size: 0.78rem;
 	}
 
 	.skeleton-card {
