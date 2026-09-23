@@ -37,3 +37,25 @@ export type UpdateProfilePayload = {
 	avatar_url?: string | null;
 	cover_image_url?: string | null;
 };
+
+export type PlatformGoal = {
+	id: string;
+	slug: string;
+	label: string;
+};
+
+export type SearchProfile = {
+	user_id: string;
+	username: string;
+	bio?: string;
+	avatar_url?: string;
+	location?: string;
+	goals: PlatformGoal[];
+};
+
+export type SearchProfilesResponse = {
+	results: SearchProfile[];
+	total: number;
+	limit: number;
+	offset: number;
+};

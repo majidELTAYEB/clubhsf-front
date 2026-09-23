@@ -1,6 +1,6 @@
 // src/lib/features/profile/api.ts
 import { api } from '$lib/services/api';
-import type { Profile, Goal, PresignResponse, UpdateProfilePayload } from './types';
+import type { Profile, Goal, PresignResponse, UpdateProfilePayload, SearchProfilesResponse } from './types';
 
 // Certains endpoints du domaine profil enveloppent leur réponse dans
 // { success, data }, d'autres renvoient un corps vide (204) ou l'objet brut.
@@ -54,4 +54,15 @@ export function presignImageUpload(kind: 'avatar' | 'cover', filename: string, c
 			content_type: contentType
 		})
 	) as Promise<PresignResponse>;
+}
+
+export function searchProfiles(query: string, opts?: { limit?: number; offset?: number }) {
+	const params = new URLSearchParams();
+	if (query) params.set('q', query);
+	if (opts?.limit) params.set('limit', String(opts.limit));
+	if (opts?.offset) params.set('offset', String(opts.offset));
+	const qs = params.toString();
+	return unwrap<SearchProfilesResponse>(
+		api.get(`/profiles/search${qs ? `?${qs}` : ''}`)
+	) as Promise<SearchProfilesResponse>;
 }

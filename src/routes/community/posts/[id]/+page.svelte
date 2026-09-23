@@ -202,6 +202,7 @@
 	.masthead {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1.25rem;
   padding: 1rem 1.5rem;
   padding-top: calc(1rem + env(safe-area-inset-top));

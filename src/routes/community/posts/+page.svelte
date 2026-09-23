@@ -9,6 +9,7 @@
 	import PostForm from '$lib/features/posts/components/post-form.svelte';
 	import NotificationPrompt from '$lib/components/NotificationPrompt.svelte';
 	import NotificationCenter from '$lib/features/notifications/components/NotificationCenter.svelte';
+	import UsersIcon from "@lucide/svelte/icons/users";
 
 	let posts = $state<Post[]>([]);
 	let nextCursor = $state<string | undefined>(undefined);
@@ -109,6 +110,10 @@
 <div class="archive">
 	<div class="masthead">
 		<span class="masthead__eyebrow">Communauté</span>
+			<a href="/community/members" class="members-btn">
+		<UsersIcon size={13} strokeWidth={2} />
+		<span>Membres</span>
+	</a>
 		<button type="button" class="new-post-btn" onclick={openCreate}>
 			<PlusIcon size={13} strokeWidth={2} />
 			<span>Nouveau post</span>
@@ -221,7 +226,7 @@
 	}
 
 	.new-post-btn {
-		margin-left: auto;
+		/* margin-left: auto; */
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
@@ -412,4 +417,22 @@
 	@media (min-width: 640px) {
 		.modal__body { padding: 1.5rem; }
 	}
+
+	.members-btn {
+	margin-left: auto;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.5rem 0.9rem;
+	background: none;
+	color: var(--fg);
+	border: 1px solid var(--border);
+	font-family: 'Inter', sans-serif;
+	font-size: 0.75rem;
+	font-weight: 500;
+	text-decoration: none;
+	cursor: pointer;
+	transition: border-color 0.2s ease;
+}
+.members-btn:hover { border-color: var(--fg); }
 </style>

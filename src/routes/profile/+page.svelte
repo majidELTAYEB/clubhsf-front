@@ -296,6 +296,7 @@
   padding: 1rem 1.5rem;
   padding-top: calc(1rem + env(safe-area-inset-top));
   border-bottom: 1px solid var(--border);
+  justify-content: space-between;
 }
 	.masthead__eyebrow {
 		font-size: 0.68rem;
