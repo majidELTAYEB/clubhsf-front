@@ -12,6 +12,8 @@
 	import { useLiveChat } from '$lib/hooks/use-live-chat.svelte';
 	import { useViewerCount } from '$lib/hooks/use-viewer-count.svelte';
 	import NotificationCenter from '$lib/features/notifications/components/NotificationCenter.svelte';
+	import { getWsToken } from '$lib/assets/api/ws-token';
+
 
 	let { data }: { data: PageData } = $props();
 	let live = $derived(data.live);
@@ -46,7 +48,7 @@
 		return 'Terminé';
 	}
 
-	const chat = useLiveChat(live.id, data.wsToken ?? '');
+const chat = useLiveChat(live.id, async () => (await getWsToken()).token);
 	chat.setHistory(data.chatHistory);
 
 	const viewerCount = useViewerCount(live.id);

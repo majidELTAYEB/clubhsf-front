@@ -3,7 +3,8 @@ import * as Sentry from '@sentry/sveltekit';
 import type { Handle } from '@sveltejs/kit';
 import { AUTH0_TOKEN_URL, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } from '$lib/config/auth0.config';
 import type { AuthUser, TokenSet, UserProfile } from '$lib/features/auth/types';
-import { env } from 'process';
+// import { env } from 'process';
+import { env } from '$env/dynamic/private';
 
 function decodeJwt<T>(token: string): T {
 	const payload = token.split('.')[1];
@@ -96,6 +97,7 @@ export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, re
 		const meRes = await fetch(`${env.BACKEND_URL}/me`, {
 			headers: { Authorization: `Bearer ${tokens.access_token}` }
 		});
+
 		if (meRes.ok) {
 			const me = await meRes.json();
 			event.cookies.set('user_profile', JSON.stringify(me), {
@@ -126,6 +128,7 @@ export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, re
 	if (user && profileCookie) {
 		try {
 			const profile: UserProfile = JSON.parse(profileCookie);
+			event.locals.userProfile = profile;
 			user = {
 				...user,
 				role: profile.role,
@@ -148,6 +151,7 @@ export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, re
 
 	event.locals.user = user;
 	event.locals.accessToken = accessToken ?? null;
+	
 
 	const publicRoutePrefixes = ['/', '/auth', '/access'];
 	const isPublicRoute =

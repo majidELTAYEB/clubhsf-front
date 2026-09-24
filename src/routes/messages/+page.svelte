@@ -2,4 +2,4 @@
 	import ConversationsList from '$lib/features/messaging/components/ConversationsList.svelte';
 </script>
 
-<ConversationsList />
+<!-- <ConversationsList /> -->

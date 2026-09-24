@@ -163,6 +163,7 @@ export const actions: Actions = {
 		// qui est l'UUID interne et que la Management API n'accepte pas.
 		const userId = profile.auth_id;
 
+
 		if (!userId) {
 			console.error('user_profile cookie sans auth_id, reconnecte-toi pour le régénérer.');
 			return fail(500, { error: "Impossible d'identifier le compte. Reconnecte-toi et réessaie." });

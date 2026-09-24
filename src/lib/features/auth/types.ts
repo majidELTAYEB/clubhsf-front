@@ -19,6 +19,7 @@ export interface AuthUser {
   hasFullAccess: boolean;
 }
 
+
 export interface UserProfile {
   id: string;
   email: string;

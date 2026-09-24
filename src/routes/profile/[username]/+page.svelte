@@ -1,13 +1,19 @@
 <script lang="ts">
-	import ExternalLinkIcon from "@lucide/svelte/icons/external-link";
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import ExternalLinkIcon from "@lucide/svelte/icons/external-link";
+	import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
 	import { getUserByUsername } from '$lib/features/profile/api';
+	import { createConversation } from '$lib/features/messaging/api';
 	import type { Profile } from '$lib/features/profile/types';
 	import NotificationCenter from "$lib/features/notifications/components/NotificationCenter.svelte";
 
 	let profile = $state<Profile | null>(null);
 	let loading = $state(true);
 	let loadError = $state<string | null>(null);
+
+	let contacting = $state(false);
+	let contactError = $state<string | null>(null);
 
 	async function loadProfile(username: string) {
 		loading = true;
@@ -33,6 +39,27 @@
 
 	function initials(name: string | undefined | null) {
 		return (name ?? '').trim().slice(0, 2).toUpperCase() || '?';
+	}
+
+	// L'utilisateur connecté vient des données de layout (voir +layout.svelte :
+	// data.user), pas d'un store séparé. On masque "Contacter" sur son propre profil.
+	const isOwnProfile = $derived(
+		!!profile && !!$page.data.user && profile.user_id === $page.data.user.id
+	);
+
+	async function contactProfile() {
+		if (!profile || contacting) return;
+
+		contacting = true;
+		contactError = null;
+
+		try {
+			const conv = await createConversation({ participant_id: profile.user_id });
+			await goto(`/messages/${conv.id}`);
+		} catch (err) {
+			contactError = 'Impossible de démarrer la conversation';
+			contacting = false;
+		}
 	}
 </script>
 
@@ -104,7 +131,23 @@
 						Membre depuis {new Date(profile.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
 					</span>
 				</div>
+
+				{#if !isOwnProfile}
+					<button
+						type="button"
+						class="contact-btn"
+						disabled={contacting}
+						onclick={contactProfile}
+					>
+						<MessageCircleIcon size={15} strokeWidth={2} />
+						<span>{contacting ? 'Ouverture…' : 'Contacter'}</span>
+					</button>
+				{/if}
 			</div>
+
+			{#if contactError}
+				<p class="contact-error">{contactError}</p>
+			{/if}
 
 			{#if profile.bio}
 				<p class="bio">{profile.bio}</p>
@@ -376,6 +419,39 @@
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.7rem;
 		color: var(--muted);
+	}
+
+	.contact-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.55rem 1rem;
+		background: var(--fg);
+		border: 1px solid var(--fg);
+		color: #fff;
+		font-family: 'Inter', sans-serif;
+		font-size: 0.78rem;
+		font-weight: 500;
+		cursor: pointer;
+		flex-shrink: 0;
+		transition: opacity 0.15s ease;
+		margin-bottom: 0.2rem;
+	}
+	@media (min-width: 640px) {
+		.contact-btn { margin-bottom: 0.4rem; }
+	}
+	.contact-btn:hover:not(:disabled) {
+		opacity: 0.85;
+	}
+	.contact-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.contact-error {
+		margin-top: 0.75rem;
+		font-size: 0.78rem;
+		color: #b3402e;
 	}
 
 	.bio {

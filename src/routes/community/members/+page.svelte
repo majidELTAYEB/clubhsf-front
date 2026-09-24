@@ -5,7 +5,9 @@
 	import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
 	import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
 	import XIcon from "@lucide/svelte/icons/x";
+	import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
 	import { searchProfiles, getGoalsCatalog } from '$lib/features/profile/api';
+	import { createConversation } from '$lib/features/messaging/api';
 	import type { SearchProfile, Goal } from '$lib/features/profile/types';
 
 	let query = $state('');
@@ -19,6 +21,11 @@
 
 	let loading = $state(false);
 	let searchError = $state<string | null>(null);
+
+	// id du membre en cours de contact (désactive son bouton le temps de
+	// l'appel, évite un double-clic qui créerait deux requêtes en parallèle)
+	let contactingId = $state<string | null>(null);
+	let contactError = $state<string | null>(null);
 
 	let debounceHandle: ReturnType<typeof setTimeout> | undefined;
 	let requestId = 0; // ignore les reponses obsoletes (race condition)
@@ -112,6 +119,27 @@
 			searchError = err instanceof Error ? err.message : 'Impossible de charger les membres';
 		} finally {
 			if (currentRequest === requestId) loading = false;
+		}
+	}
+
+	// Crée (ou récupère, si elle existe déjà — géré côté backend par
+	// FindDirectBetween) la conversation DM avec ce membre, puis redirige
+	// directement vers le fil.
+	async function contactMember(e: MouseEvent, member: SearchProfile) {
+		e.preventDefault();
+		e.stopPropagation(); // la carte entière est un <a>, on ne veut pas naviguer vers le profil
+
+		if (contactingId) return; // déjà une création en cours
+
+		contactingId = member.user_id;
+		contactError = null;
+
+		try {
+			const conv = await createConversation({ participant_id: member.user_id });
+			await goto(`/messages/${conv.id}`);
+		} catch (err) {
+			contactError = 'Impossible de démarrer la conversation';
+			contactingId = null;
 		}
 	}
 
@@ -253,6 +281,16 @@
 							{:else}
 								<span class="member-card__initial">{member.username.charAt(0).toUpperCase()}</span>
 							{/if}
+
+							<button
+								type="button"
+								class="member-card__contact"
+								disabled={contactingId === member.user_id}
+								onclick={(e) => contactMember(e, member)}
+								aria-label="Contacter {member.username}"
+							>
+								<MessageCircleIcon size={14} strokeWidth={2} />
+							</button>
 						</div>
 						<div class="member-card__info">
 							<span class="member-card__name">{member.username}</span>
@@ -266,6 +304,10 @@
 					</a>
 				{/each}
 			</div>
+
+			{#if contactError}
+				<p class="contact-error">{contactError}</p>
+			{/if}
 
 			{#if totalPages > 1}
 				<nav class="pagination" aria-label="Pagination des membres">
@@ -519,6 +561,53 @@
 		font-weight: 500;
 		font-size: 2rem;
 		color: var(--muted);
+	}
+
+	.member-card__contact {
+		position: absolute;
+		bottom: 0.5rem;
+		right: 0.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.1rem;
+		height: 2.1rem;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.92);
+		border: 1px solid var(--border);
+		color: var(--fg);
+		cursor: pointer;
+		opacity: 0;
+		transform: translateY(4px);
+		transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
+	}
+	.member-card:hover .member-card__contact,
+	.member-card:focus-within .member-card__contact {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	.member-card__contact:hover:not(:disabled) {
+		background: var(--fg);
+		color: #fff;
+	}
+	.member-card__contact:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	/* toujours visible sur mobile (pas de hover) */
+	@media (hover: none) {
+		.member-card__contact {
+			opacity: 1;
+			transform: none;
+			background: rgba(255, 255, 255, 0.85);
+		}
+	}
+
+	.contact-error {
+		margin-top: 1rem;
+		text-align: center;
+		font-size: 0.8rem;
+		color: #b3402e;
 	}
 
 	.member-card__info {
