@@ -16,7 +16,7 @@
 	);
 	let replays = $derived(
 		lives
-			.filter((l) => l.status === 'ended')
+			.filter((l) => l.mux_asset_id !== null)
 			.sort((a, b) => new Date(b.schedule_at).getTime() - new Date(a.schedule_at).getTime())
 	);
 
