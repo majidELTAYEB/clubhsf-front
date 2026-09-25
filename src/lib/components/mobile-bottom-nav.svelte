@@ -20,7 +20,6 @@
 		return page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
 	}
 
-	console.log(unreadStore.hasUnread, "ahhhhhh")
 </script>
 
 <nav class="bottom-nav" aria-label="Navigation principale">
