@@ -6,12 +6,14 @@
     import LibraryIcon from "@lucide/svelte/icons/library";
     	import Webcam from "@lucide/svelte/icons/webcam";
 		import Newspaper from "@lucide/svelte/icons/newspaper";
+			import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
 
 	const items = [
 		{ href: '/masterclass', label: 'Masterclass', icon: LibraryIcon },
 		{ href: '/lives', label: 'Lives', icon: Webcam },
 		{ href: '/community/posts', label: 'Posts', icon: Newspaper },
 		{ href: '/livestreams-replays', label: 'Replays', icon: Videotape },
+		{href: '/messages', label: 'Messages', icon: MessageCircleIcon },
 		{ href: '/profile', label: 'Profil', icon: UserRound },
 	];
 

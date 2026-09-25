@@ -27,7 +27,7 @@
 
 <div class="archive">
 	<div class="masthead">
-		<a href="/livestreams-replays" class="back-link">
+		<a href="/lives" class="back-link">
 			<ArrowLeftIcon size={13} strokeWidth={1.75} />
 			<span>Replays</span>
 		</a>
