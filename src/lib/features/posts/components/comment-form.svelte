@@ -101,7 +101,7 @@
 		border: 1px solid var(--border);
 		background: var(--bg);
 		font-family: 'Inter', sans-serif;
-		font-size: 16px;
+		font-size: 0.85rem;
 		color: var(--fg);
 		resize: vertical;
 	}

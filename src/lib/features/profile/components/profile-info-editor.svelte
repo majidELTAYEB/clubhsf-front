@@ -534,7 +534,7 @@
 		padding: 0.55rem 0.7rem;
 		border: 1px solid var(--border);
 		font-family: 'Inter', sans-serif;
-		font-size: 16px; /* évite le zoom auto d'iOS Safari sur les champs < 16px */
+		font-size: 0.85rem;
 		color: var(--fg);
 	}
 	.field input:focus, .field textarea:focus { outline: none; border-color: var(--fg); }
@@ -607,7 +607,7 @@
 	.social-add select {
 		border: 1px solid var(--border);
 		padding: 0.5rem;
-		font-size: 16px; /* évite le zoom auto d'iOS Safari */
+		font-size: 0.85rem;
 		flex: 1 1 auto;
 		min-width: 6.5rem;
 	}
@@ -615,7 +615,7 @@
 		flex: 3 1 8rem;
 		border: 1px solid var(--border);
 		padding: 0.5rem;
-		font-size: 16px; /* évite le zoom auto d'iOS Safari */
+		font-size: 0.85rem;
 		min-width: 0;
 	}
 	.social-add button {

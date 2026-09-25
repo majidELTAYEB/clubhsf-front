@@ -744,9 +744,4 @@
 		opacity: 0.3;
 		cursor: not-allowed;
 	}
-	@media (max-width: 860px) {
-    .composer textarea {
-        font-size: 16px;
-    }
-}
 </style>

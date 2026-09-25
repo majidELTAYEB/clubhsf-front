@@ -37,7 +37,7 @@ html, body {
 input,
 textarea,
 select {
-	font-size: max(16px, 1rem);
+	font-size: max(0.85rem, 1rem);
 }
 
 :root {
