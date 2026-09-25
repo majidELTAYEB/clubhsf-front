@@ -127,7 +127,7 @@
 	let navMain = $derived([
 		{ title: "Masterclass", url: "/masterclass", icon: LibraryIcon, isActive: true },
 		{ title: "Live", url: "/lives", icon: Webcam, isActive: true },
-		{ title: "Community", url: "/community/posts", icon: UsersRound, isActive: true },
+		{ title: "Communité", url: "/community/posts", icon: UsersRound, isActive: true },
 		{ title: "Profil", url: "/profile", icon: UserRound, isActive: true },
 		{ title: "Messages", url: "/messages", icon: MessageCircleIcon, isActive: true, showBadge: unreadStore.hasUnread },
 	]);
