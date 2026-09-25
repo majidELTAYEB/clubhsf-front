@@ -159,7 +159,7 @@
 	});
 </script>
 
-<div class="notif-center">
+<!-- <div class="notif-center">
 	<button type="button" class="bell-btn" onclick={toggle} aria-label="Notifications">
 		<BellIcon size={18} strokeWidth={1.75} />
 		{#if unreadCount > 0}
@@ -243,7 +243,7 @@
 			</div>
 		</div>
 	{/if}
-</div>
+</div> -->
 
 <style>
 	.notif-center {

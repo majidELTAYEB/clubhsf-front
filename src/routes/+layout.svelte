@@ -35,14 +35,15 @@
 
 </script>
 
-{#if isAuthenticated}
+<!-- {#if isAuthenticated}
 	<Toaster position="top-center" richColors/>
 
 
 	{#if hasFullAccess}
-		<Sidebar.Provider open={data.sidebarOpen} isMobileGuess={data.isMobileGuess}>
+	<div class="app-shell">
+		<Sidebar.Provider open={data.sidebarOpen} isMobileGuess={data.isMobileGuess} >
 			<AppSidebar />
-			<Sidebar.Inset>
+			<Sidebar.Inset class="min-h-0">
 			{#if data.user?.role === 'admin'}
 				<header class="navbar">
 					<div class="navbar__left">
@@ -58,8 +59,7 @@
 					{/if}
 
 				<div class="mobile-content-pad">
-				<!-- <InstallPWA /> -->
-				
+
 				<InstallHint />
 					{@render children()}
 						
@@ -70,6 +70,48 @@
 		{#if data.user?.role !== 'admin'}
 			<MobileBottomNav />
 		{/if}
+	</div>
+
+	{:else}
+		{@render children()}
+	{/if}
+{:else}
+	{@render children()}
+{/if} -->
+
+{#if isAuthenticated}
+	<Toaster position="top-center" richColors/>
+
+	{#if hasFullAccess}
+		<div class="app-shell">
+			<Sidebar.Provider open={data.sidebarOpen} isMobileGuess={data.isMobileGuess} style="flex: 1; min-height: 0;">
+				<AppSidebar />
+				<Sidebar.Inset class="min-h-0">
+					{#if data.user?.role === 'admin'}
+						<header class="navbar">
+							<div class="navbar__left">
+								<div class="trigger-wrap" class:trigger-wrap--mobile-hidden={data.user?.role !== 'admin'}>
+									<SidebarTriggerResponsive />
+								</div>
+								<span class="navbar__mark">Club</span>
+							</div>
+							<div class="navbar__right">
+								<CreateMenu />
+							</div>
+						</header>
+					{/if}
+
+					<div class="mobile-content-pad">
+						<InstallHint />
+						{@render children()}
+					</div>
+				</Sidebar.Inset>
+			</Sidebar.Provider>
+
+			{#if data.user?.role !== 'admin'}
+				<MobileBottomNav />
+			{/if}
+		</div>
 	{:else}
 		{@render children()}
 	{/if}
@@ -117,19 +159,35 @@
 		padding-right: 1rem;
 	}
 
+.mobile-content-pad {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	overflow-y: auto;
+	box-sizing: border-box;
+}
+
 	/* Empêche le contenu d'être caché derrière la bottom nav fixe sur mobile */
-	@media (max-width: 767px) {
+	/* @media (max-width: 767px) {
 		.mobile-content-pad {
 			padding-bottom: calc(3.75rem + env(safe-area-inset-bottom));
 		}
-	}
+	} */
 
 	/* Sur mobile, un non-admin a déjà la bottom nav — inutile d'avoir aussi
 	   le trigger hamburger de la sidebar en double. Reste visible sur desktop
 	   pour tout le monde, et sur mobile pour les admins (pas de bottom nav). */
-	@media (max-width: 767px) {
+	/* @media (max-width: 767px) {
 		.trigger-wrap--mobile-hidden {
 			display: none;
 		}
-	}
+	} */
+
+	.app-shell {
+	display: flex;
+	flex-direction: column;
+	height: 100dvh;
+	overflow: hidden;
+}
 </style>

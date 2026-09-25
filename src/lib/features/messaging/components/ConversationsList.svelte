@@ -597,7 +597,10 @@
 		background: var(--bg);
 		color: var(--fg);
 		font-family: 'Inter', sans-serif;
-		min-height: 100%;
+		height: 100%;           /* était: min-height: 100% */
+		display: flex;          /* nouveau */
+		flex-direction: column; /* nouveau */
+		overflow: hidden;       /* nouveau */
 	}
 
 .masthead {
@@ -609,6 +612,7 @@
 	padding: 0 1.25rem;
 	padding-top: env(safe-area-inset-top);
 	border-bottom: 1px solid var(--border);
+	flex-shrink: 0;  
 }
 .masthead__eyebrow {
 	font-family: 'Fraunces', serif;
@@ -636,10 +640,14 @@
 		color: var(--muted);
 	}
 
-	.archive__inner {
+		.archive__inner {
 		max-width: 700px;
 		margin: 0 auto;
 		padding: 2.5rem 1.5rem 6rem;
+		flex: 1;           /* nouveau */
+		min-height: 0;     /* nouveau, essentiel */
+		overflow-y: auto;  /* nouveau : LE scroll se passe ici */
+		width: 100%;       /* nouveau */
 	}
 
 	.heading {

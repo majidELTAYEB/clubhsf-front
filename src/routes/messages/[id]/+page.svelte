@@ -13,6 +13,6 @@
 
 <style>
 	.thread-page {
-		height: 100dvh;
+		height: 100%;
 	}
 </style>

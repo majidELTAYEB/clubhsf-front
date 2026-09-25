@@ -53,11 +53,12 @@
 		--border: #e6e3db;
 
 		display: none;
-		position: fixed;
-		bottom: 0;
+		/* position: fixed; */
+		/* bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 90;
+		z-index: 90; */
+		flex-shrink: 0;
 		background: var(--bg);
 		border-top: 1px solid var(--border);
 		padding-bottom: env(safe-area-inset-bottom);

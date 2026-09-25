@@ -42,7 +42,8 @@ import { onDestroy } from 'svelte';
 	--border: #e6e3db;
 	--header-height: 3.5rem;
 	display: flex;
-	height: 100%;
+	height: 100%;      /* au lieu de 100vh */
+	min-height: 0; 
 	overflow: hidden;
 }
 
@@ -60,6 +61,15 @@ import { onDestroy } from 'svelte';
 		display: flex;
 		flex-direction: column;
 	}
+
+	/* .messages-shell__list {
+    width: 22rem;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    overflow: hidden;   
+    display: flex;
+    flex-direction: column;
+/* }  */
 
 
 	.messages-shell__empty {
