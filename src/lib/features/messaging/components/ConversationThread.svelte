@@ -691,21 +691,21 @@
 		flex: 1;
 	}
 	.composer textarea {
-		box-sizing: border-box;
-		width: 100%;
-		min-height: 2.4rem;
-		resize: none;
-		max-height: 8.75rem;
-		border: 1px solid var(--border);
-		padding: 0.5rem 2.6rem 0.5rem 0.8rem;
-		font-family: 'Inter', sans-serif;
-		font-size: 0.85rem;
-		line-height: 1.4;
-		color: var(--fg);
-		background: none;
-		outline: none;
-		transition: border-color 0.15s;
-	}
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 2.4rem;
+    resize: none;
+    max-height: 8.75rem;
+    border: 1px solid var(--border);
+    padding: 0.5rem 2.6rem 0.5rem 0.8rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--fg);
+    background: none;
+    outline: none;
+    transition: border-color 0.15s;
+}
 	.composer textarea:focus {
 		border-color: var(--fg);
 	}
@@ -744,4 +744,9 @@
 		opacity: 0.3;
 		cursor: not-allowed;
 	}
+	@media (max-width: 860px) {
+    .composer textarea {
+        font-size: 16px;
+    }
+}
 </style>

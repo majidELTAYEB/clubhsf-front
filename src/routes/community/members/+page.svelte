@@ -436,6 +436,12 @@
 		color: var(--fg);
 		background: none;
 	}
+
+	@media (max-width: 860px) {
+    .search-bar input{
+        font-size: 16px;
+    }}
+
 	.search-bar input::placeholder {
 		color: var(--muted);
 	}
