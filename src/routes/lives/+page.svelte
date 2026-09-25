@@ -7,17 +7,13 @@
 
 	let { data }: { data: PageData } = $props();
 	let lives = $derived(data.lives);
+	let replays = $derived(data.replays);
 
 	let liveLives = $derived(lives.filter((l) => l.status === 'active' || l.status === 'disconnected'));
 	let upcomingLives = $derived(
 		lives
 			.filter((l) => l.status === 'scheduled')
 			.sort((a, b) => new Date(a.schedule_at).getTime() - new Date(b.schedule_at).getTime())
-	);
-	let replays = $derived(
-		lives
-			.filter((l) => l.mux_asset_id !== null)
-			.sort((a, b) => new Date(b.schedule_at).getTime() - new Date(a.schedule_at).getTime())
 	);
 
 	// Le prochain live à venir (le plus proche dans le temps)

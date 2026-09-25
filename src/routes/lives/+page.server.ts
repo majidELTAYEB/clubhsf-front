@@ -4,6 +4,7 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	const res = await fetch(`/api/livestreams`);
+	const resReplays = await fetch(`/api/livestreams/replays`);
 
 	if (res.status === 404) {
 		throw error(404, "impossible de charger les lives");
@@ -13,5 +14,6 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	}
 
 	const lives = await res.json();
-	return { lives };
+	const replays = await resReplays.json();
+	return { lives, replays };
 };
