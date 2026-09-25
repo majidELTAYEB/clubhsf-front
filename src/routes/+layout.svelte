@@ -12,6 +12,7 @@
 	import type { LayoutData } from './$types';
 	import type { Snippet } from "svelte";
 	import InstallHint from "$lib/components/InstallHint.svelte";
+	import { unreadStore } from '$lib/features/messaging/unread.svelte';
 
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
@@ -23,6 +24,12 @@
 	onMount(() => {
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('/sw.js');
+		}
+	});
+
+		$effect(() => {
+		if (hasFullAccess && data.userProfile?.id) {
+			unreadStore.init(data.userProfile.id);
 		}
 	});
 

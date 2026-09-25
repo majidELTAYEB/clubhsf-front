@@ -17,7 +17,7 @@
 	let results = $state<SearchProfile[]>([]);
 	let total = $state(0);
 	let offset = $state(0);
-	const limit = 2;
+	const limit = 20;
 
 	let loading = $state(false);
 	let searchError = $state<string | null>(null);

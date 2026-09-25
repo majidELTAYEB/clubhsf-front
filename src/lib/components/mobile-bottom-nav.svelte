@@ -1,18 +1,17 @@
 <!-- src/lib/components/mobile-bottom-nav.svelte -->
 <script lang="ts">
 	import { page } from '$app/state';
-	import Videotape from "@lucide/svelte/icons/videotape";
 	import UserRound from "@lucide/svelte/icons/user-round";
     import LibraryIcon from "@lucide/svelte/icons/library";
     	import Webcam from "@lucide/svelte/icons/webcam";
-		import Newspaper from "@lucide/svelte/icons/newspaper";
 			import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
+			import UsersRound from "@lucide/svelte/icons/users-round";
+	import { unreadStore } from '$lib/features/messaging/unread.svelte';
 
 	const items = [
 		{ href: '/masterclass', label: 'Masterclass', icon: LibraryIcon },
 		{ href: '/lives', label: 'Lives', icon: Webcam },
-		{ href: '/community/posts', label: 'Posts', icon: Newspaper },
-		{ href: '/livestreams-replays', label: 'Replays', icon: Videotape },
+		{ href: '/community/posts', label: 'Community', icon: UsersRound },
 		{href: '/messages', label: 'Messages', icon: MessageCircleIcon },
 		{ href: '/profile', label: 'Profil', icon: UserRound },
 	];
@@ -20,6 +19,8 @@
 	function isActive(href: string) {
 		return page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
 	}
+
+	console.log(unreadStore.hasUnread, "ahhhhhh")
 </script>
 
 <nav class="bottom-nav" aria-label="Navigation principale">
@@ -33,6 +34,9 @@
 		>
 			<span class="bottom-nav__icon">
 				<item.icon size={17} strokeWidth={active ? 2 : 1.6} />
+				{#if item.href === '/messages' && unreadStore.hasUnread}
+					<span class="bottom-nav__dot" aria-label="Nouveaux messages"></span>
+				{/if}
 			</span>
 			<span class="bottom-nav__label">{item.label}</span>
 		</a>
@@ -60,7 +64,6 @@
 		font-family: 'Inter', sans-serif;
 	}
 
-	/* Uniquement sur mobile — la sidebar reste la navigation sur desktop */
 	@media (max-width: 767px) {
 		.bottom-nav {
 			display: flex;
@@ -83,13 +86,12 @@
 		transition: color 0.15s ease;
 	}
 
-	/* Feedback tactile immédiat au tap — essentiel pour une bottom nav mobile,
-	   sinon le doigt masque l'icône et rien ne confirme le clic. */
 	.bottom-nav__item:active .bottom-nav__icon {
 		transform: scale(0.9);
 	}
 
 	.bottom-nav__icon {
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -100,12 +102,21 @@
 		transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
 	}
 
-	/* Même vocabulaire que les carrés d'objectifs du profil : sélectionné =
-	   carré plein noir, non sélectionné = juste l'icône, pas de couleur accent. */
 	.bottom-nav__item--active .bottom-nav__icon {
 		background: var(--fg);
 		border-color: var(--fg);
 		color: #fff;
+	}
+
+	.bottom-nav__dot {
+		position: absolute;
+		top: 0.15rem;
+		right: 0.15rem;
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 50%;
+		background: #e53e3e;
+		border: 1.5px solid var(--bg);
 	}
 
 	.bottom-nav__label {

@@ -1,6 +1,8 @@
 <script lang="ts">
+import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
 	import ConversationsList from '$lib/features/messaging/components/ConversationsList.svelte';
+	import { unreadStore } from '$lib/features/messaging/unread.svelte';
 
 
 	let { children }: { children: () => unknown } = $props();
@@ -12,6 +14,10 @@
 	// ⚠️ Ajuste "conversationId" ci-dessous pour matcher exactement le nom
 	// de ton dossier dynamique (src/routes/messages/[conversationId]/).
 	let isThreadOpen = $derived(page.params.id !== undefined);
+
+	onDestroy(() => {
+		unreadStore.refresh();
+	});
 </script>
 
 <div class="messages-shell">

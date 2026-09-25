@@ -1,23 +1,21 @@
-<script lang="ts" module>
+<!-- <script lang="ts" module>
 	import LifeBuoyIcon from "@lucide/svelte/icons/life-buoy";
 	import Signal from "@lucide/svelte/icons/signal";
 	import Webcam from "@lucide/svelte/icons/webcam";
 	import Library from "@lucide/svelte/icons/library";
 	import LibraryIcon from "@lucide/svelte/icons/library";
-	import Videotape from "@lucide/svelte/icons/videotape";
-	import Newspaper from "@lucide/svelte/icons/newspaper";
 	import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
 	import UserRound from "@lucide/svelte/icons/user-round";
 	import Logo from "$lib/assets/logo.jpeg"
+	import UsersRound from "@lucide/svelte/icons/users-round";
 
 
 	const navMain = [
 		{ title: "Masterclass", url: "/masterclass", icon: LibraryIcon, isActive: true },
 		{ title: "Live", url: "/lives", icon: Webcam, isActive: true },
-		{ title: "Replay Live", url: "/livestreams-replays", icon: Videotape, isActive: true },
-		{ title: "Posts", url: "/community/posts", icon: Newspaper, isActive: true },
+		{ title: "Community", url: "/community/posts", icon: UsersRound, isActive: true },
 		{ title: "Profil", url: "/profile", icon: UserRound, isActive: true },
-		{ title: "Messages", url: "/messages", icon: MessageCircleIcon, isActive: true },
+		{ title: "Messages", url: "/messages", icon: MessageCircleIcon, isActive: true, showBadge: unreadStore.hasUnread },
 	];
 
 	const navSecondary = [
@@ -39,6 +37,7 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import type { ComponentProps } from "svelte";
 	import { page } from "$app/state";
+	import { unreadStore } from "$lib/features/messaging/unread.svelte";
 
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 
@@ -77,7 +76,89 @@
 			{#if page.data.user?.role === 'admin'}
 				<NavProjects projects={admin} />
 			{/if}
-			<!-- <NavSecondary items={navSecondary} class="mt-auto" /> -->
+
+		</Sidebar.Content>
+		<Sidebar.Footer>
+			<NavUser {user} />
+		</Sidebar.Footer>
+	</Sidebar.Root>
+</div> -->
+
+<script lang="ts" module>
+	import LifeBuoyIcon from "@lucide/svelte/icons/life-buoy";
+	import Signal from "@lucide/svelte/icons/signal";
+	import Webcam from "@lucide/svelte/icons/webcam";
+	import Library from "@lucide/svelte/icons/library";
+	import LibraryIcon from "@lucide/svelte/icons/library";
+	import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
+	import UserRound from "@lucide/svelte/icons/user-round";
+	import Logo from "$lib/assets/logo.jpeg"
+	import UsersRound from "@lucide/svelte/icons/users-round";
+
+	const navSecondary = [
+		{ title: "Support", url: "#", icon: LifeBuoyIcon },
+	];
+
+	const admin = [
+		{ name: "Configuration Live", url: "/admin/lives", icon: Signal },
+		{ name: "Configuration Collections", url: "/admin/collections", icon: Library },
+		{ name: "Membres", url: "/admin/members", icon: UserRound },
+	];
+</script>
+
+<script lang="ts">
+	import NavMain from "./nav-main.svelte";
+	import NavProjects from "./nav-projects.svelte";
+	import NavSecondary from "./nav-secondary.svelte";
+	import NavUser from "./nav-user.svelte";
+	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+	import type { ComponentProps } from "svelte";
+	import { page } from "$app/state";
+	import { unreadStore } from "$lib/features/messaging/unread.svelte";
+
+	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
+
+	let user = $derived({
+		name: page.data.user?.name || "",
+		email: page.data.user?.email || "",
+		avatar: page.data.user?.picture || "/avatars/shadcn.jpg",
+	});
+
+	let navMain = $derived([
+		{ title: "Masterclass", url: "/masterclass", icon: LibraryIcon, isActive: true },
+		{ title: "Live", url: "/lives", icon: Webcam, isActive: true },
+		{ title: "Community", url: "/community/posts", icon: UsersRound, isActive: true },
+		{ title: "Profil", url: "/profile", icon: UserRound, isActive: true },
+		{ title: "Messages", url: "/messages", icon: MessageCircleIcon, isActive: true, showBadge: unreadStore.hasUnread },
+	]);
+</script>
+
+<div class="sidebar-theme">
+	<Sidebar.Root bind:ref variant="sidebar" collapsible="icon" {...restProps}>
+		<Sidebar.Header>
+			<Sidebar.Menu>
+				<Sidebar.MenuItem>
+					<Sidebar.MenuButton size="lg" class="sidebar-brand">
+						{#snippet child({ props })}
+							<a href="/masterclass" {...props}>
+								<div class="sidebar-brand__mark">
+									<img src={Logo} alt="Logo" class="w-full h-full object-cover" />
+								</div>
+								<div class="grid flex-1 text-start leading-tight">
+									<span class="sidebar-brand__name">Hacker son futur</span>
+									<span class="sidebar-brand__author">Franck Lahoui</span>
+								</div>
+							</a>
+						{/snippet}
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+			</Sidebar.Menu>
+		</Sidebar.Header>
+		<Sidebar.Content>
+			<NavMain items={navMain} />
+			{#if page.data.user?.role === 'admin'}
+				<NavProjects projects={admin} />
+			{/if}
 		</Sidebar.Content>
 		<Sidebar.Footer>
 			<NavUser {user} />
