@@ -110,18 +110,20 @@
 <div class="archive">
 	<div class="masthead">
 		<span class="masthead__eyebrow">Communauté</span>
-			<a href="/community/members" class="members-btn">
-		<UsersIcon size={13} strokeWidth={2} />
-		<span>Membres</span>
-	</a>
-		<button type="button" class="new-post-btn" onclick={openCreate}>
-			<PlusIcon size={13} strokeWidth={2} />
-			<span>Nouveau post</span>
-		</button>
-			<div class="masthead__right">
-		<NotificationCenter />
 
-	</div>
+		<div class="masthead__actions">
+			<a href="/community/members" class="icon-btn icon-btn--ghost" aria-label="Voir les membres">
+				<UsersIcon size={15} strokeWidth={2} />
+				<span class="icon-btn__label">Membres</span>
+			</a>
+			<button type="button" class="icon-btn icon-btn--solid" onclick={openCreate} aria-label="Créer un nouveau post">
+				<PlusIcon size={15} strokeWidth={2} />
+				<span class="icon-btn__label">Nouveau post</span>
+			</button>
+			<div class="masthead__notif">
+				<NotificationCenter />
+			</div>
+		</div>
 	</div>
 
 	<div class="archive__inner">
@@ -210,36 +212,90 @@
 		min-height: 100%;
 	}
 
+	/* --- Header --- */
 	.masthead {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  padding: 1rem 1.5rem;
-  padding-top: calc(1rem + env(safe-area-inset-top));
-  border-bottom: 1px solid var(--border);
-}
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem 1.5rem;
+		padding-top: calc(1rem + env(safe-area-inset-top));
+		border-bottom: 1px solid var(--border);
+	}
 	.masthead__eyebrow {
 		font-size: 0.68rem;
 		font-weight: 600;
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
+		flex-shrink: 0;
 	}
 
-	.new-post-btn {
-		/* margin-left: auto; */
+	.masthead__actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-left: auto;
+	}
+	.masthead__notif {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+	}
+
+	/* Boutons d'action du header : icône + label, qui se réduisent en icône
+	   seule sur mobile (le label reste dans le DOM pour l'accessibilité). */
+	.icon-btn {
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		gap: 0.4rem;
-		padding: 0.5rem 0.9rem;
-		background: var(--fg);
-		color: #fff;
-		border: 1px solid var(--fg);
+		padding: 0.55rem 0.9rem;
 		font-family: 'Inter', sans-serif;
 		font-size: 0.75rem;
 		font-weight: 500;
+		text-decoration: none;
+		white-space: nowrap;
 		cursor: pointer;
+		transition: border-color 0.2s ease, opacity 0.2s ease;
 	}
-	.new-post-btn:hover { opacity: 0.85; }
+	.icon-btn--ghost {
+		background: none;
+		color: var(--fg);
+		border: 1px solid var(--border);
+	}
+	.icon-btn--ghost:hover { border-color: var(--fg); }
+	.icon-btn--solid {
+		background: var(--fg);
+		color: #fff;
+		border: 1px solid var(--fg);
+	}
+	.icon-btn--solid:hover { opacity: 0.85; }
+
+	@media (max-width: 520px) {
+		.masthead {
+			gap: 0.5rem;
+			padding-left: 1rem;
+			padding-right: 1rem;
+		}
+		.masthead__actions {
+			gap: 0.4rem;
+		}
+		.icon-btn {
+			padding: 0.6rem;
+			min-width: 2.4rem;
+			min-height: 2.4rem;
+		}
+		.icon-btn__label {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+		}
+	}
 
 	.archive__inner {
 		max-width: 640px;
@@ -417,22 +473,4 @@
 	@media (min-width: 640px) {
 		.modal__body { padding: 1.5rem; }
 	}
-
-	.members-btn {
-	margin-left: auto;
-	display: inline-flex;
-	align-items: center;
-	gap: 0.4rem;
-	padding: 0.5rem 0.9rem;
-	background: none;
-	color: var(--fg);
-	border: 1px solid var(--border);
-	font-family: 'Inter', sans-serif;
-	font-size: 0.75rem;
-	font-weight: 500;
-	text-decoration: none;
-	cursor: pointer;
-	transition: border-color 0.2s ease;
-}
-.members-btn:hover { border-color: var(--fg); }
 </style>

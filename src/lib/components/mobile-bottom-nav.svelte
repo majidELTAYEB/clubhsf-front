@@ -60,7 +60,7 @@
 		flex-shrink: 0;
 		background: var(--bg);
 		border-top: 1px solid var(--border);
-		padding-bottom: env(safe-area-inset-bottom);
+		/* padding-bottom: env(safe-area-inset-bottom); */
 		font-family: 'Inter', sans-serif;
 	}
 
