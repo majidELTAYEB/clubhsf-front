@@ -20,16 +20,16 @@
 
 <svelte:head>
 	<title>Masterclass</title>
-		<div class="masthead__right">
-		<NotificationCenter />
-
-	</div>
 </svelte:head>
 
 <div class="archive">
 	<div class="masthead">
 		<span class="masthead__eyebrow">Masterclass</span>
 		<span class="catalog-number">{data.collections.length} collection{data.collections.length > 1 ? 's' : ''}</span>
+		<div class="masthead__right">
+		<NotificationCenter />
+
+	</div>
 	</div>
 
 	<div class="archive__inner">
