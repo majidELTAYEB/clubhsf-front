@@ -155,7 +155,7 @@
             <div class="archive__main">
                 <span class="eyebrow">Synopsis</span>
                 <p class="description">
-                    {video.Description ?? "Lorem ipsum is the graphic and publishing industry's standard dummy text. It is a scrambled version of classical Latin text derived from Cicero's De Finibus Bonorum et Malorum, altered to serve as a nonsensical placeholder."}
+                    {video.Description}
                 </p>
             </div>
 
