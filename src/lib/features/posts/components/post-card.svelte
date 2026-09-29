@@ -301,7 +301,7 @@
 </style> -->
 
 <!-- src/lib/features/posts/components/post-card.svelte -->
-<script lang="ts">
+<!-- <script lang="ts">
 	import HeartIcon from "@lucide/svelte/icons/heart";
 	import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
 	import PencilIcon from "@lucide/svelte/icons/pencil";
@@ -603,4 +603,343 @@
 		border-color: var(--fg);
 	}
 	.confirm-bar__actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+</style> -->
+
+<script lang="ts">
+	import HeartIcon from "@lucide/svelte/icons/heart";
+	import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
+	import PencilIcon from "@lucide/svelte/icons/pencil";
+	import Trash2Icon from "@lucide/svelte/icons/trash-2";
+	import { likePost, unlikePost, deletePost } from '$lib/features/posts/api';
+	import type { Post } from '$lib/features/posts/types';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+
+	let {
+		post,
+		onEdit,
+		onDeleted
+	}: {
+		post: Post;
+		onEdit: (post: Post) => void;
+		onDeleted: (postId: string) => void;
+	} = $props();
+
+	// État local optimiste — évite d'attendre l'aller-retour réseau pour
+	// le feedback visuel du like, comme suggéré par la doc API.
+	let liked = $state(post.liked_by_me);
+	let likesCount = $state(post.likes_count);
+	let likeBusy = $state(false);
+	let deleting = $state(false);
+	let showConfirmDelete = $state(false);
+
+	async function toggleLike() {
+		if (likeBusy) return;
+		likeBusy = true;
+
+		const wasLiked = liked;
+		// Bascule immédiate, on revient en arrière seulement si ça échoue.
+		liked = !wasLiked;
+		likesCount += wasLiked ? -1 : 1;
+
+		try {
+			if (wasLiked) {
+				await unlikePost(post.id);
+			} else {
+				await likePost(post.id);
+			}
+		} catch {
+			liked = wasLiked;
+			likesCount += wasLiked ? 1 : -1;
+		} finally {
+			likeBusy = false;
+		}
+	}
+
+	async function confirmDelete() {
+		deleting = true;
+		try {
+			await deletePost(post.id);
+			onDeleted(post.id);
+		} catch {
+			deleting = false;
+			showConfirmDelete = false;
+		}
+	}
+
+	function formatDate(iso: string) {
+		return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+	}
+	function goToProfile() {
+		goto(resolve('/profile/[username]', { username: post.author.username }));
+	}
+</script>
+
+<article class="post-card">
+	<header class="post-card__head">
+		<div class="post-card__author">
+			<a href={`/profile/${post.author.username}`} class="post-card__avatar">
+				{#if post.author.avatar_url}
+					<img src={post.author.avatar_url} alt={post.author.username} />
+				{:else}
+					<span>{post.author.username.slice(0, 2).toUpperCase()}</span>
+				{/if}
+			</a>
+			<div class="post-card__meta">
+				<a href={`/profile/${post.author.username}`} class="post-card__username">{post.author.username}</a>
+				<span class="post-card__date">{formatDate(post.created_at)}</span>
+			</div>
+		</div>
+
+		{#if post.can_edit}
+			<div class="post-card__actions">
+				<button type="button" onclick={() => onEdit(post)} aria-label="Éditer">
+					<PencilIcon size={14} strokeWidth={1.75} />
+				</button>
+				<button type="button" onclick={() => (showConfirmDelete = true)} aria-label="Supprimer">
+					<Trash2Icon size={14} strokeWidth={1.75} />
+				</button>
+			</div>
+		{/if}
+	</header>
+
+	<a href={`/community/posts/${post.id}`} class="post-card__title">{post.title}</a>
+	<p class="post-card__content">{post.content}</p>
+
+	{#if post.cover_image_url}
+		<a href={`/community/posts/${post.id}`} class="post-card__cover">
+			<img src={post.cover_image_url} alt={post.title} loading="lazy" />
+		</a>
+	{/if}
+
+	<footer class="post-card__footer">
+		<button type="button" class="post-card__stat" class:post-card__stat--active={liked} onclick={toggleLike}>
+			<HeartIcon size={16} strokeWidth={1.75} fill={liked ? 'currentColor' : 'none'} />
+			<span>{likesCount}</span>
+		</button>
+		<a href={`/community/posts/${post.id}`} class="post-card__stat">
+			<MessageCircleIcon size={16} strokeWidth={1.75} />
+			<span>{post.comments_count}</span>
+		</a>
+	</footer>
+
+	{#if showConfirmDelete}
+		<div class="confirm-bar">
+			<span>Supprimer ce post ?</span>
+			<div class="confirm-bar__actions">
+				<button type="button" onclick={confirmDelete} disabled={deleting}>
+					{deleting ? 'Suppression…' : 'Confirmer'}
+				</button>
+				<button type="button" onclick={() => (showConfirmDelete = false)} disabled={deleting}>
+					Annuler
+				</button>
+			</div>
+		</div>
+	{/if}
+</article>
+
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap');
+
+	/* Une entrée = un bloc délimité par un filet noir, pas une carte encadrée */
+	.post-card {
+		--fg: #000000;
+		--muted: #6a6a6a;
+		--rule: #000000;
+
+		padding: 1.75rem 0;
+		border-bottom: 1px solid var(--rule);
+		color: var(--fg);
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
+	}
+
+	.post-card a:focus-visible,
+	.post-card button:focus-visible {
+		outline: 2px solid var(--fg);
+		outline-offset: 2px;
+	}
+
+	.post-card__head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1.1rem;
+	}
+
+	.post-card__author {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		min-width: 0;
+	}
+
+	.post-card__avatar {
+		width: 2.25rem;
+		height: 2.25rem;
+		flex-shrink: 0;
+		border: 1px solid var(--rule);
+		background: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-size: 0.72rem;
+		font-weight: 700;
+		color: var(--fg);
+		text-decoration: none;
+	}
+	.post-card__avatar img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.post-card__meta {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+	}
+
+	.post-card__username {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--fg);
+		text-decoration: none;
+	}
+	.post-card__username:hover {
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	.post-card__date {
+		font-size: 0.78rem;
+		color: var(--muted);
+	}
+
+	.post-card__actions {
+		display: flex;
+		gap: 0.4rem;
+		flex-shrink: 0;
+	}
+	.post-card__actions button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		background: none;
+		border: 1px solid var(--rule);
+		color: var(--fg);
+		cursor: pointer;
+		transition: background-color 0.2s ease, color 0.2s ease;
+	}
+	.post-card__actions button:hover {
+		background: var(--fg);
+		color: #fff;
+	}
+
+	.post-card__title {
+		display: block;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: clamp(1.5rem, 3.2vw, 1.9rem);
+		line-height: 1.08;
+		letter-spacing: -0.03em;
+		color: var(--fg);
+		text-decoration: none;
+		margin-bottom: 0.6rem;
+	}
+	.post-card__title:hover {
+		text-decoration: underline;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 4px;
+	}
+
+	.post-card__content {
+		font-size: 0.97rem;
+		line-height: 1.6;
+		color: #222;
+		white-space: pre-line;
+	}
+
+	.post-card__cover {
+		display: block;
+		margin-top: 1.1rem;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		background: #eee;
+	}
+	.post-card__cover img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.post-card__footer {
+		display: flex;
+		gap: 1.5rem;
+		margin-top: 1.25rem;
+	}
+
+	.post-card__stat {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		background: none;
+		border: none;
+		padding: 0;
+		color: var(--muted);
+		text-decoration: none;
+		font-family: 'Hanken Grotesk', sans-serif;
+		font-size: 0.88rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: color 0.2s ease;
+	}
+	.post-card__stat:hover,
+	.post-card__stat--active {
+		color: var(--fg);
+	}
+
+	.confirm-bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-top: 1.25rem;
+		padding: 0.75rem 1rem;
+		border: 1px solid var(--rule);
+		font-size: 0.85rem;
+		font-weight: 500;
+	}
+	.confirm-bar__actions {
+		display: flex;
+		gap: 0.5rem;
+	}
+	.confirm-bar__actions button {
+		padding: 0.4rem 0.85rem;
+		font-family: 'Hanken Grotesk', sans-serif;
+		font-size: 0.8rem;
+		font-weight: 600;
+		cursor: pointer;
+		border: 1px solid var(--rule);
+		background: none;
+		color: var(--fg);
+		transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+	}
+	.confirm-bar__actions button:first-child {
+		background: var(--fg);
+		color: #fff;
+	}
+	.confirm-bar__actions button:hover:not(:disabled) {
+		opacity: 0.8;
+	}
+	.confirm-bar__actions button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 </style>

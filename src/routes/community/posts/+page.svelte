@@ -109,7 +109,7 @@
 
 <div class="archive">
 	<div class="masthead">
-		<span class="masthead__eyebrow">Communauté</span>
+		<span class="masthead__brand">Communauté</span>
 
 		<div class="masthead__actions">
 			<a href="/community/members" class="icon-btn icon-btn--ghost" aria-label="Voir les membres">
@@ -128,7 +128,7 @@
 
 	<div class="archive__inner">
 		<header class="heading">
-			<h1 class="title">Le fil</h1>
+			<h1 class="title"><span class="title__mask"><span class="title__in">Le fil</span></span></h1>
 			<p class="subtitle">Ce que la communauté partage, en direct.</p>
 		</header>
 		<NotificationPrompt variant="banner" />
@@ -187,7 +187,7 @@
 			<div class="modal__head">
 				<span class="modal__title">{activeModal === 'create' ? 'Nouveau post' : 'Éditer le post'}</span>
 				<button type="button" class="modal__close" onclick={closeModal} aria-label="Fermer">
-					<XIcon size={16} strokeWidth={1.75} />
+					<XIcon size={18} strokeWidth={1.75} />
 				</button>
 			</div>
 			<div class="modal__body">
@@ -198,35 +198,41 @@
 {/if}
 
 <style>
-	@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
+	@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap');
 
 	.archive {
 		--bg: #ffffff;
-		--fg: #121210;
-		--muted: #77746c;
-		--border: #e6e3db;
+		--fg: #000000;
+		--muted: #6a6a6a;
+		--rule: #000000;
 
 		background: var(--bg);
 		color: var(--fg);
-		font-family: 'Inter', sans-serif;
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
 		min-height: 100%;
 	}
 
-	/* --- Header --- */
+	.archive a:focus-visible,
+	.archive button:focus-visible {
+		outline: 2px solid var(--fg);
+		outline-offset: 2px;
+	}
+
+	/* --- Barre du haut --- */
 	.masthead {
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
 		padding: 1rem 1.5rem;
 		padding-top: calc(1rem + env(safe-area-inset-top));
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--rule);
 	}
-	.masthead__eyebrow {
-		font-size: 0.68rem;
-		font-weight: 600;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
+	.masthead__brand {
 		flex-shrink: 0;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.05rem;
+		letter-spacing: -0.02em;
 	}
 
 	.masthead__actions {
@@ -248,27 +254,30 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.4rem;
-		padding: 0.55rem 0.9rem;
-		font-family: 'Inter', sans-serif;
-		font-size: 0.75rem;
-		font-weight: 500;
+		padding: 0.55rem 0.95rem;
+		font-family: 'Hanken Grotesk', sans-serif;
+		font-size: 0.82rem;
+		font-weight: 600;
 		text-decoration: none;
 		white-space: nowrap;
 		cursor: pointer;
-		transition: border-color 0.2s ease, opacity 0.2s ease;
+		transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
 	}
 	.icon-btn--ghost {
 		background: none;
 		color: var(--fg);
-		border: 1px solid var(--border);
+		border: 1px solid var(--rule);
 	}
-	.icon-btn--ghost:hover { border-color: var(--fg); }
+	.icon-btn--ghost:hover {
+		background: var(--fg);
+		color: #fff;
+	}
 	.icon-btn--solid {
 		background: var(--fg);
 		color: #fff;
 		border: 1px solid var(--fg);
 	}
-	.icon-btn--solid:hover { opacity: 0.85; }
+	.icon-btn--solid:hover { opacity: 0.8; }
 
 	@media (max-width: 520px) {
 		.masthead {
@@ -298,43 +307,66 @@
 	}
 
 	.archive__inner {
-		max-width: 640px;
+		max-width: 760px;
 		margin: 0 auto;
 		padding: 2.5rem 1.5rem 6rem;
 	}
 
+	/* Titre — l'élément mémorable, révélé une seule fois au chargement */
 	.heading {
-		padding-bottom: 1.75rem;
-		border-bottom: 1px solid var(--border);
+		padding-bottom: 1.5rem;
+		border-bottom: 1px solid var(--rule);
 	}
 	.title {
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-weight: 500;
-		font-size: clamp(1.9rem, 4.5vw, 2.5rem);
-		line-height: 1.1;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 800;
+		font-size: clamp(4rem, 18vw, 9rem);
+		line-height: 0.88;
+		letter-spacing: -0.045em;
+	}
+	.title__mask {
+		display: block;
+		overflow: hidden;
+		padding-bottom: 0.06em;
+	}
+	.title__in {
+		display: inline-block;
+		transform: translateY(105%);
+		animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+	}
+	@keyframes rise {
+		to { transform: translateY(0); }
 	}
 	.subtitle {
-		margin-top: 0.5rem;
-		font-size: 0.88rem;
+		margin-top: 0.9rem;
+		font-size: 1.05rem;
+		font-weight: 500;
+		letter-spacing: -0.01em;
 		color: var(--muted);
 	}
 
 	.feed-list {
 		display: flex;
 		flex-direction: column;
-		gap: 1.25rem;
-		margin-top: 2rem;
 	}
 
 	.empty-state {
-		margin-top: 2.5rem;
-		padding: 6rem 1rem;
-		text-align: center;
-		border: 1px dashed var(--border);
+		margin-top: 2rem;
+		padding: 4rem 0;
+		border-top: 1px solid var(--rule);
+		border-bottom: 1px solid var(--rule);
 	}
-	.empty-state__title { font-size: 0.9rem; font-weight: 500; }
-	.empty-state__body { margin-top: 0.3rem; font-size: 0.82rem; color: var(--muted); }
+	.empty-state__title {
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.4rem;
+		letter-spacing: -0.02em;
+	}
+	.empty-state__body {
+		margin-top: 0.4rem;
+		font-size: 0.92rem;
+		color: var(--muted);
+	}
 
 	.load-more {
 		display: flex;
@@ -342,29 +374,33 @@
 		margin-top: 2rem;
 	}
 	.load-more button {
-		padding: 0.65rem 1.5rem;
+		padding: 0.75rem 1.75rem;
 		background: none;
-		border: 1px solid var(--border);
+		border: 1px solid var(--rule);
 		color: var(--fg);
-		font-size: 0.78rem;
-		font-weight: 500;
+		font-family: 'Hanken Grotesk', sans-serif;
+		font-size: 0.85rem;
+		font-weight: 600;
 		cursor: pointer;
-		transition: border-color 0.2s ease;
+		transition: background-color 0.2s ease, color 0.2s ease;
 	}
-	.load-more button:hover { border-color: var(--fg); }
+	.load-more button:hover:not(:disabled) {
+		background: var(--fg);
+		color: #fff;
+	}
 	.load-more button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 	/* Skeleton */
 	.skeleton-card {
-		padding: 1.5rem;
-		border: 1px solid var(--border);
+		padding: 1.75rem 0;
+		border-bottom: 1px solid var(--rule);
 		display: flex;
 		flex-direction: column;
 		gap: 0.6rem;
 	}
 	.skeleton-line {
 		position: relative;
-		background: #eeece6;
+		background: #ececec;
 		overflow: hidden;
 	}
 	.skeleton-line::after {
@@ -378,19 +414,21 @@
 	@keyframes skeleton-shimmer {
 		to { transform: translateX(100%); }
 	}
-	@media (prefers-reduced-motion: reduce) {
-		.skeleton-line::after { animation: none; }
-	}
 	.skeleton-line--author { width: 30%; height: 0.8rem; }
-	.skeleton-line--title { width: 55%; height: 1.1rem; margin-top: 0.4rem; }
+	.skeleton-line--title { width: 55%; height: 1.5rem; margin-top: 0.4rem; }
 	.skeleton-line--body { width: 100%; height: 0.75rem; margin-top: 0.4rem; }
 	.skeleton-line--body-short { width: 70%; height: 0.75rem; }
+
+	@media (prefers-reduced-motion: reduce) {
+		.skeleton-line::after { animation: none; }
+		.title__in { animation: none; transform: none; }
+	}
 
 	/* Modale — bottom sheet mobile, boîte centrée desktop */
 	.modal-overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(18, 18, 16, 0.4);
+		background: rgba(0, 0, 0, 0.5);
 		z-index: 100;
 	}
 	.modal-wrap {
@@ -409,16 +447,16 @@
 
 	.modal {
 		--bg: #ffffff;
-		--fg: #121210;
-		--muted: #77746c;
-		--border: #e6e3db;
+		--fg: #000000;
+		--muted: #6a6a6a;
+		--rule: #000000;
 
 		width: 100%;
 		max-width: 100%;
 		max-height: 88vh;
 		background: var(--bg);
-		border-top: 1px solid var(--border);
-		box-shadow: 0 -8px 32px rgba(18, 18, 16, 0.14);
+		color: var(--fg);
+		border-top: 1px solid var(--rule);
 		display: flex;
 		flex-direction: column;
 		pointer-events: auto;
@@ -426,10 +464,9 @@
 	}
 	@media (min-width: 640px) {
 		.modal {
-			max-width: 540px;
+			max-width: 560px;
 			max-height: 85vh;
-			border: 1px solid var(--border);
-			box-shadow: 0 24px 64px rgba(18, 18, 16, 0.18);
+			border: 1px solid var(--rule);
 			padding-bottom: 0;
 		}
 	}
@@ -439,17 +476,17 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 1.1rem 1.25rem;
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--rule);
 		flex-shrink: 0;
 	}
 	@media (min-width: 640px) {
 		.modal__head { padding: 1.25rem 1.5rem; }
 	}
 	.modal__title {
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-weight: 500;
-		font-size: 1.05rem;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.3rem;
+		letter-spacing: -0.03em;
 	}
 	.modal__close {
 		display: flex;
@@ -460,10 +497,11 @@
 		background: none;
 		border: none;
 		cursor: pointer;
-		color: var(--muted);
+		color: var(--fg);
 		margin: -0.4rem;
+		transition: opacity 0.2s ease;
 	}
-	.modal__close:hover { color: var(--fg); }
+	.modal__close:hover { opacity: 0.55; }
 
 	.modal__body {
 		flex: 1;
