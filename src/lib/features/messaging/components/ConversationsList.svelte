@@ -416,7 +416,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
-	import {  listConversations } from '../api';
+	import { listConversations } from '../api';
 	import { messagingSocket } from '../ws';
 	import type { ConversationSummaryResponse, WSEvent } from '../types';
 	import { getWsToken } from '$lib/assets/api/ws-token';
@@ -436,7 +436,6 @@
 		try {
 			const page = await listConversations();
 			conversations = page.conversations;
-			console.log(currentUserId)
 		} catch (err) {
 			loadError = err instanceof Error ? err.message : 'Impossible de charger les conversations';
 		} finally {
@@ -508,18 +507,13 @@
 		<button type="button" class="back-btn" onclick={() => goto('/community/posts')} aria-label="Retour">
 			<ArrowLeftIcon size={16} strokeWidth={2} />
 		</button>
-		<span class="masthead__eyebrow">Communauté</span>
+		<span class="masthead__brand">Messages</span>
 		{#if !loading && conversations.length > 0}
-			<span class="catalog-number">{conversations.length} conversation{conversations.length > 1 ? 's' : ''}</span>
+			<span class="catalog-number">{conversations.length}</span>
 		{/if}
 	</div>
 
 	<div class="archive__inner">
-		<header class="heading">
-			<!-- <span class="title">Messages</span> -->
-			<p class="subtitle">Tes échanges avec les autres membres.</p>
-		</header>
-
 		{#if loading}
 			<ul class="convo-list">
 				{#each Array(4) as _}
@@ -585,41 +579,40 @@
 </div>
 
 <style>
-	@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+	@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap');
 
 	.archive {
 		--bg: #ffffff;
 		--fg: #000000;
-		--muted: #666666;
-		--border: #e6e3db;
-		--tint: #f0f0f0;
+		--muted: #6a6a6a;
+		--rule: #000000;
 
 		background: var(--bg);
 		color: var(--fg);
-		font-family: 'Inter', sans-serif;
-		height: 100%;           /* était: min-height: 100% */
-		display: flex;          /* nouveau */
-		flex-direction: column; /* nouveau */
-		overflow: hidden;       /* nouveau */
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
 	}
 
-.masthead {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	height: 3.5rem;
-	box-sizing: content-box;
-	padding: 0 1.25rem;
-	padding-top: env(safe-area-inset-top);
-	border-bottom: 1px solid var(--border);
-	flex-shrink: 0;  
-}
-.masthead__eyebrow {
-	font-family: 'Fraunces', serif;
-	font-style: italic;
-	font-weight: 500;
-	font-size: 0.95rem; /* aligné sur masthead__title du thread */
-}
+	.masthead {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		height: 3.5rem;
+		box-sizing: content-box;
+		padding: 0 1.25rem;
+		padding-top: env(safe-area-inset-top);
+		border-bottom: 1px solid var(--rule);
+		flex-shrink: 0;
+	}
+	.masthead__brand {
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.05rem;
+		letter-spacing: -0.02em;
+	}
 	.back-btn {
 		display: flex;
 		align-items: center;
@@ -632,39 +625,19 @@
 		cursor: pointer;
 		margin: -0.3rem;
 	}
+	.back-btn:hover { opacity: 0.55; }
 	.catalog-number {
 		margin-left: auto;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.68rem;
-		letter-spacing: 0.04em;
-		color: var(--muted);
-	}
-
-		.archive__inner {
-		max-width: 700px;
-		margin: 0 auto;
-		padding: 2.5rem 1.5rem 6rem;
-		flex: 1;           /* nouveau */
-		min-height: 0;     /* nouveau, essentiel */
-		overflow-y: auto;  /* nouveau : LE scroll se passe ici */
-		width: 100%;       /* nouveau */
-	}
-
-	.heading {
-		padding-bottom: 1.75rem;
-		border-bottom: 1px solid var(--border);
-	}
-	.title {
-		font-family: 'Fraunces', serif;
-		font-style: italic;
+		font-size: 0.85rem;
 		font-weight: 500;
-		font-size: clamp(1.9rem, 4.5vw, 2.5rem);
-		line-height: 1.1;
-	}
-	.subtitle {
-		margin-top: 0.5rem;
-		font-size: 0.88rem;
 		color: var(--muted);
+	}
+
+	.archive__inner {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		width: 100%;
 	}
 
 	.convo-list {
@@ -681,15 +654,16 @@
 		padding: 1.1rem 1.5rem;
 		background: none;
 		border: none;
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--rule);
 		cursor: pointer;
 		text-align: left;
 		font-family: inherit;
 		color: inherit;
-		transition: background 0.15s ease;
+		transition: background-color 0.15s ease, color 0.15s ease;
 	}
 	.row:hover {
-		background: var(--tint);
+		background: var(--fg);
+		color: #fff;
 	}
 
 	.row__portrait {
@@ -697,8 +671,12 @@
 		width: 3.1rem;
 		height: 3.1rem;
 		flex-shrink: 0;
-		background: var(--tint);
+		background: #fff;
+		border: 1px solid var(--rule);
 		overflow: hidden;
+	}
+	.row:hover .row__portrait {
+		border-color: #fff;
 	}
 	.row__portrait img {
 		width: 100%;
@@ -712,11 +690,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-weight: 500;
-		font-size: 1.1rem;
-		color: var(--muted);
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.05rem;
+		color: var(--fg);
 	}
 
 	.row__content {
@@ -724,7 +701,7 @@
 		min-width: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0.2rem;
+		gap: 0.25rem;
 	}
 	.row__top {
 		display: flex;
@@ -733,23 +710,22 @@
 		gap: 0.75rem;
 	}
 	.row__name {
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-weight: 500;
-		font-size: 0.95rem;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1rem;
+		letter-spacing: -0.01em;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	.row__name--unread {
-		font-weight: 600;
-	}
 	.row__time {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.68rem;
-		letter-spacing: 0.02em;
+		font-size: 0.75rem;
+		font-weight: 500;
 		color: var(--muted);
 		flex-shrink: 0;
+	}
+	.row:hover .row__time {
+		color: #d0d0d0;
 	}
 	.row__bottom {
 		display: flex;
@@ -758,38 +734,47 @@
 		gap: 0.5rem;
 	}
 	.row__preview {
-		font-size: 0.8rem;
+		font-size: 0.85rem;
 		color: var(--muted);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
+	.row:hover .row__preview {
+		color: #d0d0d0;
+	}
 	.row__preview--unread {
 		color: var(--fg);
-		font-weight: 500;
+		font-weight: 600;
+	}
+	.row:hover .row__preview--unread {
+		color: #fff;
 	}
 	.row__dot {
-		width: 0.4rem;
-		height: 0.4rem;
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 9999px;
 		background: var(--fg);
 		flex-shrink: 0;
 	}
+	.row:hover .row__dot {
+		background: #fff;
+	}
 
 	.empty-state {
-		margin-top: 2.5rem;
-		padding: 6rem 1rem;
+		margin-top: 1rem;
+		padding: 4rem 1.5rem;
 		text-align: center;
-		border: 1px dashed var(--border);
 	}
 	.empty-state__title {
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-size: 1.1rem;
-		font-weight: 500;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.2rem;
+		letter-spacing: -0.02em;
 	}
 	.empty-state__body {
 		margin-top: 0.4rem;
-		font-size: 0.82rem;
+		font-size: 0.85rem;
 		color: var(--muted);
 	}
 
@@ -798,12 +783,13 @@
 		align-items: center;
 		gap: 1rem;
 		padding: 1.1rem 1.5rem;
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--rule);
 	}
 	.skeleton-avatar {
 		width: 3.1rem;
 		height: 3.1rem;
-		background: var(--tint);
+		background: #ececec;
+		border: 1px solid var(--rule);
 		position: relative;
 		overflow: hidden;
 		flex-shrink: 0;
@@ -812,11 +798,11 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 0.45rem;
+		gap: 0.5rem;
 	}
 	.skeleton-line {
-		height: 0.6rem;
-		background: var(--tint);
+		height: 0.65rem;
+		background: #ececec;
 		position: relative;
 		overflow: hidden;
 	}
