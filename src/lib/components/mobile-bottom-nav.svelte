@@ -11,7 +11,7 @@
 	const items = [
 		{ href: '/masterclass', label: 'Masterclass', icon: LibraryIcon },
 		{ href: '/lives', label: 'Lives', icon: Webcam },
-		{ href: '/community/posts', label: 'Communité', icon: UsersRound },
+		{ href: '/community/posts', label: 'Communauté', icon: UsersRound },
 		{href: '/messages', label: 'Messages', icon: MessageCircleIcon },
 		{ href: '/profile', label: 'Profil', icon: UserRound },
 	];
