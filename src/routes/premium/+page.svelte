@@ -451,9 +451,9 @@
 								{#if mc.description}
 									<p class="card__desc">{mc.description}</p>
 								{/if}
-								<p class="card__meta">
+								<!-- <p class="card__meta">
 									{mc.item_count} contenu{mc.item_count > 1 ? 's' : ''}
-								</p>
+								</p> -->
 
 								<div class="card__footer">
 									{#if mc.owned}
