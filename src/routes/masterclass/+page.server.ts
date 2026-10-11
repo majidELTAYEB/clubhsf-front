@@ -5,10 +5,8 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	const res = await fetch('/api/collections');
 
 	if (!res.ok) {
-	const body = await res.text();
-	console.error('[masterclass] /api/collections', res.status, body);
-	throw error(res.status, 'Impossible de charger les collections');
-}
+		throw error(res.status, 'Impossible de charger les collections');
+	}
 
 	const collections = await res.json();
 
