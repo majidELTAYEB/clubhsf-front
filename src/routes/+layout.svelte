@@ -35,50 +35,6 @@
 
 </script>
 
-<!-- {#if isAuthenticated}
-	<Toaster position="top-center" richColors/>
-
-
-	{#if hasFullAccess}
-	<div class="app-shell">
-		<Sidebar.Provider open={data.sidebarOpen} isMobileGuess={data.isMobileGuess} >
-			<AppSidebar />
-			<Sidebar.Inset class="min-h-0">
-			{#if data.user?.role === 'admin'}
-				<header class="navbar">
-					<div class="navbar__left">
-						<div class="trigger-wrap" class:trigger-wrap--mobile-hidden={data.user?.role !== 'admin'}>
-							<SidebarTriggerResponsive />
-						</div>
-						<span class="navbar__mark">Club</span>
-					</div>
-						<div class="navbar__right">
-							<CreateMenu />
-						</div>
-				</header>
-					{/if}
-
-				<div class="mobile-content-pad">
-
-				<InstallHint />
-					{@render children()}
-						
-				</div>
-			</Sidebar.Inset>
-		</Sidebar.Provider>
-
-		{#if data.user?.role !== 'admin'}
-			<MobileBottomNav />
-		{/if}
-	</div>
-
-	{:else}
-		{@render children()}
-	{/if}
-{:else}
-	{@render children()}
-{/if} -->
-
 {#if isAuthenticated}
 	<Toaster position="top-center" richColors/>
 
