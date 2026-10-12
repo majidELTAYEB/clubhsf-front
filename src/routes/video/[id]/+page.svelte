@@ -57,10 +57,11 @@
     );
 
     let hlsUrl = $derived(
-        pullZoneHost && video?.BunnyVideoID
-            ? `https://${pullZoneHost}/${video.BunnyVideoID}/playlist.m3u8`
-            : ''
-    );
+    video?.PlaybackURL ||
+    (pullZoneHost && video?.BunnyVideoID
+        ? `https://${pullZoneHost}/${video.BunnyVideoID}/playlist.m3u8`
+        : '')
+);
 
     onMount(() => {
         if (hlsUrl) {
