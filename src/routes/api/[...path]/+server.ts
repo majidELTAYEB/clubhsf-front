@@ -44,7 +44,7 @@ const handle: RequestHandler = async ({ request, params, locals, url }) => {
   // Blocage premium sur les endpoints sensibles.
   // 'collections' et 'purchases' sont retirés : le backend décide (abonné, achat, admin).
   // 'videos' reste bloqué tant que la lecture par un acheteur non abonné n'est pas gérée côté backend.
-  const premiumOnlyPrefixes = ['videos', 'masterclass', 'lives'];
+  const premiumOnlyPrefixes = ['masterclass', 'lives'];
   const isPremiumOnly = premiumOnlyPrefixes.some((p) => params.path?.startsWith(p));
 
   if (isPremiumOnly && !locals.user?.hasFullAccess) {
