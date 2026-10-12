@@ -28,6 +28,7 @@
 	import LoaderIcon from "@lucide/svelte/icons/loader";
 	import CheckIcon from "@lucide/svelte/icons/check";
 	import TriangleAlertIcon from "@lucide/svelte/icons/triangle-alert";
+	import CreditCardIcon from "@lucide/svelte/icons/credit-card";
 
 	import {
 		getCollection,
@@ -44,6 +45,7 @@
 	// ──────────────────────────────────────────────────────────────────────
 
 	type VideoStatus = "ready" | "processing" | "queued" | "failed";
+	type AccessType = "included" | "paid";
 
 	type Collection = {
 		id: string;
@@ -52,6 +54,8 @@
 		description?: string;
 		cover_image_url?: string;
 		is_public: boolean;
+		access_type?: AccessType;
+		price_cents?: number | null;
 		created_at: string;
 	};
 
@@ -112,25 +116,41 @@
 	let coverImageUrl = $state("");
 	let coverError = $state(false);
 	let isPublic = $state(true);
+	let accessType = $state<AccessType>("included");
+	let priceEuros = $state<number | null>(null);
 	let isSaving = $state(false);
+
+	const priceCentsInput = $derived(
+		accessType === "paid" ? Math.round((Number(priceEuros) || 0) * 100) : null
+	);
+
+	const pricingValid = $derived(accessType === "included" || (priceCentsInput ?? 0) > 0);
 
 	const hasChanges = $derived(
 		collection !== null &&
 			(title !== collection.title ||
 				description !== (collection.description ?? "") ||
 				coverImageUrl !== (collection.cover_image_url ?? "") ||
-				isPublic !== collection.is_public)
+				isPublic !== collection.is_public ||
+				accessType !== (collection.access_type ?? "included") ||
+				(accessType === "paid" && priceCentsInput !== (collection.price_cents ?? null)))
 	);
+
+	function fillForm(c: Collection) {
+		title = c.title;
+		description = c.description ?? "";
+		coverImageUrl = c.cover_image_url ?? "";
+		isPublic = c.is_public;
+		accessType = c.access_type ?? "included";
+		priceEuros = c.price_cents ? c.price_cents / 100 : null;
+	}
 
 	async function loadCollection() {
 		isLoading = true;
 		try {
 			const result = await getCollection(collectionId);
 			collection = result.data;
-			title = collection.title;
-			description = collection.description ?? "";
-			coverImageUrl = collection.cover_image_url ?? "";
-			isPublic = collection.is_public;
+			fillForm(collection!);
 		} catch {
 			toast.error("Impossible de charger la collection");
 		} finally {
@@ -140,25 +160,42 @@
 
 	function handleDiscard() {
 		if (!collection) return;
-		title = collection.title;
-		description = collection.description ?? "";
-		coverImageUrl = collection.cover_image_url ?? "";
-		isPublic = collection.is_public;
+		fillForm(collection);
 		coverError = false;
 	}
 
 	async function handleSave() {
 		if (!collection) return;
+		if (!title.trim()) {
+			toast.error("Le titre est obligatoire");
+			return;
+		}
+		if (!pricingValid) {
+			toast.error("Indique un prix supérieur à 0 pour une collection payante");
+			return;
+		}
 		isSaving = true;
 		try {
+			// Le PATCH backend écrase tous les champs : on les renvoie tous.
 			const payload = {
 				title: title.trim(),
 				description: description.trim() || undefined,
 				cover_image_url: coverImageUrl.trim() || undefined,
 				is_public: isPublic,
+				access_type: accessType,
+				price_cents: accessType === "paid" ? (priceCentsInput ?? undefined) : undefined,
 			};
 			await updateCollection(collection.id, payload);
-			collection = { ...collection, ...payload };
+			collection = {
+				...collection,
+				title: payload.title,
+				description: payload.description,
+				cover_image_url: payload.cover_image_url,
+				is_public: payload.is_public,
+				access_type: accessType,
+				// En repassant en "included", le backend conserve l'ancien prix Stripe
+				price_cents: accessType === "paid" ? priceCentsInput : collection.price_cents,
+			};
 			toast.success("Collection mise à jour");
 		} catch {
 			toast.error("Impossible d'enregistrer les modifications");
@@ -322,6 +359,11 @@
 							<LockIcon class="size-3" /> Brouillon
 						{/if}
 					</Badge>
+					{#if collection.access_type === "paid"}
+						<Badge variant="outline" class="gap-1">
+							<CreditCardIcon class="size-3" /> Payante
+						</Badge>
+					{/if}
 				{/if}
 			</div>
 		</div>
@@ -392,6 +434,60 @@
 							</div>
 							<Switch id="public-switch" bind:checked={isPublic} />
 						</div>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Tarification</CardTitle>
+						<CardDescription>
+							Les abonnés ont accès à toutes les collections. Une collection payante peut en plus être achetée à l'unité, sans abonnement.
+						</CardDescription>
+					</CardHeader>
+					<CardContent class="space-y-4">
+						<div class="grid gap-2">
+							<Label for="access-type">Accès</Label>
+							<select
+								id="access-type"
+								bind:value={accessType}
+								class="border-input bg-background w-full max-w-lg rounded-md border px-3 py-2 text-sm"
+							>
+								<option value="included">Incluse dans l'abonnement</option>
+								<option value="paid">Payante (achat à l'unité)</option>
+							</select>
+						</div>
+
+						{#if accessType === "paid"}
+							<div class="grid gap-2">
+								<Label for="price">Prix (€)</Label>
+								<input
+									id="price"
+									type="number"
+									min="1"
+									step="0.01"
+									bind:value={priceEuros}
+									placeholder="49"
+									class="border-input bg-background w-full max-w-[200px] rounded-md border px-3 py-2 text-sm"
+								/>
+								{#if !pricingValid}
+									<p class="text-xs text-destructive">Indique un prix supérieur à 0.</p>
+								{/if}
+							</div>
+
+							{#if !isPublic}
+								<p class="text-xs text-amber-600">
+									La collection est en brouillon : elle ne sera pas achetable tant qu'elle n'est pas publique.
+								</p>
+							{/if}
+
+							<p class="text-xs text-muted-foreground">
+								Changer le prix n'affecte pas les achats déjà effectués. Un nouveau prix est créé côté Stripe et l'ancien est archivé.
+							</p>
+						{:else if collection.access_type === "paid"}
+							<p class="text-xs text-muted-foreground">
+								Repasser en « incluse » conserve les achats existants : les acheteurs gardent leur accès.
+							</p>
+						{/if}
 					</CardContent>
 				</Card>
 			</div>
@@ -559,7 +655,7 @@
 					<p class="text-sm text-muted-foreground">Modifications non enregistrées</p>
 					<div class="flex gap-2">
 						<Button variant="ghost" onclick={handleDiscard} disabled={isSaving}>Annuler</Button>
-						<Button onclick={handleSave} disabled={isSaving}>
+						<Button onclick={handleSave} disabled={isSaving || !pricingValid}>
 							{#if isSaving}
 								<Spinner class="size-4 mr-2" /> Enregistrement...
 							{:else}
