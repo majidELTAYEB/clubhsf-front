@@ -999,4 +999,18 @@
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 	}
+
+		:global(html),
+:global(body) {
+	height: auto !important;
+	min-height: 100% !important;
+	overflow-y: auto !important;
+	overflow-x: hidden !important;
+}
+
+.archive {
+	min-height: 100dvh;
+	height: auto;
+	overflow: visible;
+}
 </style>
