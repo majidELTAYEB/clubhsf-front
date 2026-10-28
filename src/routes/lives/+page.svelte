@@ -1,3 +1,5 @@
+
+
 <script lang="ts">
 	import type { PageData } from './$types';
 	import LiveCard from '$lib/components/live-card.svelte';
@@ -75,7 +77,7 @@
 
 <div class="archive">
 	<div class="masthead">
-		<span class="masthead__eyebrow">Lives</span>
+		<span class="masthead__brand">Lives</span>
 		<div class="masthead__right">
 			<NotificationCenter />
 		</div>
@@ -103,15 +105,20 @@
 
 		<header class="heading">
 			<h1 class="title">
-				{activeTab === 'live' ? 'En direct' : activeTab === 'upcoming' ? 'À venir' : 'Replays'}
+				<span class="title__mask">
+					<span class="title__in">
+						{activeTab === 'live' ? 'En direct' : activeTab === 'upcoming' ? 'À venir' : 'Replays'}
+					</span>
+				</span>
 			</h1>
 
-			<nav class="tabs">
+			<nav class="tabs" aria-label="Type de lives">
 				<button
 					type="button"
 					class="tabs__item"
 					class:tabs__item--active={activeTab === 'live'}
-					on:click={() => (activeTab = 'live')}
+					aria-pressed={activeTab === 'live'}
+					onclick={() => (activeTab = 'live')}
 				>
 					En direct
 					<span class="tabs__count">{liveLives.length}</span>
@@ -120,7 +127,8 @@
 					type="button"
 					class="tabs__item"
 					class:tabs__item--active={activeTab === 'upcoming'}
-					on:click={() => (activeTab = 'upcoming')}
+					aria-pressed={activeTab === 'upcoming'}
+					onclick={() => (activeTab = 'upcoming')}
 				>
 					À venir
 					<span class="tabs__count">{upcomingLives.length}</span>
@@ -129,7 +137,8 @@
 					type="button"
 					class="tabs__item"
 					class:tabs__item--active={activeTab === 'replays'}
-					on:click={() => (activeTab = 'replays')}
+					aria-pressed={activeTab === 'replays'}
+					onclick={() => (activeTab = 'replays')}
 				>
 					Replays
 					<span class="tabs__count">{replays.length}</span>
@@ -146,25 +155,28 @@
 			<div class="replay-grid">
 				{#each visibleLives as replay, i (replay.id)}
 					<a href={`/livestreams-replays/${replay.id}`} class="replay-card">
-						<div class="replay-card__img" style={`background: ${gradientFromString(replay.title)}`}></div>
-
-						<span class="replay-card__index">{String(i + 1).padStart(2, '0')}</span>
-
-						<div class="replay-card__overlay">
+						<div class="replay-card__media">
+							<div class="replay-card__img" style={`background: ${gradientFromString(replay.title)}`}></div>
 							<span class="replay-card__play">
-								<PlayIcon size={16} strokeWidth={1.75} />
+								<PlayIcon size={18} strokeWidth={2} />
 							</span>
 						</div>
 
-						<div class="replay-card__scrim">
-							<span class="replay-card__tag">Replay</span>
+						<div class="replay-card__caption">
+							<div class="replay-card__meta">
+								<span>{String(i + 1).padStart(2, '0')}</span>
+								<span>
+									{new Date(replay.schedule_at).toLocaleDateString('fr-FR', {
+										day: '2-digit',
+										month: 'short',
+										year: 'numeric'
+									})}
+								</span>
+							</div>
 							<h3 class="replay-card__title">{replay.title}</h3>
-							<span class="replay-card__date">
-								{new Date(replay.schedule_at).toLocaleDateString('fr-FR', {
-									day: '2-digit',
-									month: 'short',
-									year: 'numeric'
-								})}
+							<span class="replay-card__action">
+								<PlayIcon size={13} strokeWidth={2} />
+								Regarder
 							</span>
 						</div>
 					</a>
@@ -187,35 +199,39 @@
 </div>
 
 <style>
-	@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+	@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap');
 
 	.archive {
 		--bg: #ffffff;
-		--fg: #121210;
-		--muted: #77746c;
-		--border: #e6e3db;
-		--accent: #b23a1f;
+		--fg: #000000;
+		--muted: #6a6a6a;
+		--rule: #000000;
 
 		background: var(--bg);
 		color: var(--fg);
-		font-family: 'Inter', sans-serif;
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
 		min-height: 100%;
 	}
 
+	.archive a:focus-visible,
+	.archive button:focus-visible {
+		outline: 2px solid var(--fg);
+		outline-offset: 2px;
+	}
+
+	/* La hauteur et le padding du masthead viennent de la règle globale du layout */
 	.masthead {
 		display: flex;
 		align-items: center;
 		gap: 1.25rem;
-		padding: 1rem 1.5rem;
-		padding-top: calc(1rem + env(safe-area-inset-top));
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--rule);
 	}
 
-	.masthead__eyebrow {
-		font-size: 0.68rem;
-		font-weight: 600;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
+	.masthead__brand {
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.05rem;
+		letter-spacing: -0.02em;
 	}
 
 	.masthead__right {
@@ -231,19 +247,17 @@
 		padding: 2.5rem 1.5rem 6rem;
 	}
 
-	/* Card "Prochain live" */
+	/* Bloc "Prochain live" — encadré noir, compte à rebours en noir plein */
 	.next-live {
-		border: 1px solid var(--fg);
-		padding: 1.1rem 1.25rem;
+		border: 1px solid var(--rule);
+		padding: 1.25rem 1.5rem;
 		margin-bottom: 1rem;
 	}
 	.next-live__label {
-		font-size: 0.66rem;
+		font-size: 0.85rem;
 		font-weight: 600;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
 		color: var(--muted);
-		margin-bottom: 0.5rem;
+		margin-bottom: 0.6rem;
 	}
 	.next-live__row {
 		display: flex;
@@ -253,164 +267,163 @@
 		flex-wrap: wrap;
 	}
 	.next-live__title {
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-weight: 500;
-		font-size: 1.2rem;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: clamp(1.4rem, 3vw, 1.9rem);
+		line-height: 1.05;
+		letter-spacing: -0.03em;
 	}
 	.next-live__date {
-		margin-top: 0.2rem;
-		font-size: 0.8rem;
+		margin-top: 0.35rem;
+		font-size: 0.9rem;
+		font-weight: 500;
 		color: var(--muted);
 		text-transform: capitalize;
 	}
 	.next-live__countdown {
 		flex-shrink: 0;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-		font-weight: 500;
-		padding: 0.4rem 0.75rem;
-		background: #f7f5f0;
-		border: 1px solid var(--border);
+		padding: 0.5rem 0.9rem;
+		background: var(--fg);
+		color: #fff;
+		font-size: 0.88rem;
+		font-weight: 600;
 	}
 
 	.archive__inner :global(.notif-banner) {
 		margin-bottom: 1.5rem;
 	}
 
+	/* Titre géant, révélé une seule fois au chargement ; il change avec l'onglet */
 	.heading {
-		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		flex-wrap: wrap;
-		gap: 1rem 1.5rem;
-		padding-bottom: 0;
-		border-bottom: 1px solid var(--border);
+		padding-top: 1rem;
 	}
 
 	.title {
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-weight: 500;
-		font-size: clamp(1.9rem, 4.5vw, 2.75rem);
-		line-height: 1.15;
-		letter-spacing: -0.01em;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 800;
+		font-size: clamp(3.5rem, 13vw, 9rem);
+		line-height: 0.88;
+		letter-spacing: -0.045em;
 		padding-bottom: 1.5rem;
 	}
+	.title__mask {
+		display: block;
+		overflow: hidden;
+		padding-bottom: 0.06em;
+	}
+	.title__in {
+		display: inline-block;
+		transform: translateY(105%);
+		animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+	}
+	@keyframes rise {
+		to { transform: translateY(0); }
+	}
 
+	/* Onglets : trois cellules séparées par des filets noirs, l'active s'inverse */
 	.tabs {
-		display: flex;
-		gap: 1.5rem;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		border-top: 1px solid var(--rule);
+		border-bottom: 1px solid var(--rule);
 	}
 
 	.tabs__item {
-		position: relative;
 		display: inline-flex;
 		align-items: center;
-		gap: 0.4rem;
-		padding-bottom: 1rem;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 0.9rem 0.5rem;
 		background: none;
 		border: none;
 		cursor: pointer;
 		color: var(--muted);
-		font-size: 0.78rem;
-		font-weight: 500;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		transition: color 0.2s ease;
+		font-family: 'Hanken Grotesk', sans-serif;
+		font-size: 0.92rem;
+		font-weight: 600;
+		transition: background-color 0.2s ease, color 0.2s ease;
 	}
-	.tabs__item::after {
-		content: '';
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: -1px;
-		height: 2px;
-		background: var(--fg);
-		transform: scaleX(0);
-		transform-origin: left;
-		transition: transform 0.25s ease;
+	.tabs__item + .tabs__item {
+		border-left: 1px solid var(--rule);
 	}
 	.tabs__item:hover {
 		color: var(--fg);
 	}
-	.tabs__item--active {
-		color: var(--fg);
-	}
-	.tabs__item--active::after {
-		transform: scaleX(1);
+	.tabs__item--active,
+	.tabs__item--active:hover {
+		background: var(--fg);
+		color: #fff;
 	}
 
 	.tabs__count {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.68rem;
-		color: var(--muted);
-	}
-	.tabs__item--active .tabs__count {
-		color: var(--fg);
+		font-size: 0.82rem;
+		font-weight: 500;
+		opacity: 0.7;
 	}
 
 	.empty-state {
-		margin-top: 2.5rem;
-		padding: 6rem 1rem;
-		text-align: center;
-		border: 1px dashed var(--border);
+		margin-top: 2rem;
+		padding: 4rem 0;
+		border-top: 1px solid var(--rule);
+		border-bottom: 1px solid var(--rule);
 	}
 	.empty-state__title {
-		font-size: 0.9rem;
-		font-weight: 500;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.4rem;
+		letter-spacing: -0.02em;
 	}
 	.empty-state__body {
-		margin-top: 0.3rem;
-		font-size: 0.82rem;
+		margin-top: 0.4rem;
+		font-size: 0.92rem;
 		color: var(--muted);
 	}
 
-	/* Grille lives (en direct / à venir) */
-	.live-grid {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 1px;
-		margin-top: 2.5rem;
-	}
-
-	@media (min-width: 640px) {
-		.live-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-	@media (min-width: 1024px) {
-		.live-grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
-	}
-
-	/* Grille replays */
+	/* Grilles — quadrillage de filets noirs ; les cartes portent leurs bordures
+	   droite/basse pour que la dernière ligne incomplète reste propre */
+	.live-grid,
 	.replay-grid {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 1px;
-		margin-top: 2.5rem;
+		margin-top: 2rem;
+		border-top: 1px solid var(--rule);
+		border-left: 1px solid var(--rule);
 	}
 
 	@media (min-width: 640px) {
+		.live-grid,
 		.replay-grid {
 			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 	@media (min-width: 1024px) {
+		.live-grid,
 		.replay-grid {
 			grid-template-columns: repeat(3, 1fr);
 		}
 	}
 
+	/* Cartes replay — même modèle que les cartes de collection */
 	.replay-card {
-		position: relative;
-		display: block;
-		aspect-ratio: 4 / 5;
-		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		background: var(--bg);
+		color: var(--fg);
+		border-right: 1px solid var(--rule);
+		border-bottom: 1px solid var(--rule);
 		text-decoration: none;
-		color: inherit;
+		transition: background-color 0.25s ease, color 0.25s ease;
+	}
+	.replay-card:focus-visible {
+		outline-offset: -4px;
+	}
+
+	.replay-card__media {
+		position: relative;
+		aspect-ratio: 4 / 3;
+		overflow: hidden;
+		background: #eee;
+		border-bottom: 1px solid var(--rule);
 	}
 
 	.replay-card__img {
@@ -418,99 +431,100 @@
 		inset: 0;
 		width: 100%;
 		height: 100%;
+		filter: grayscale(1) contrast(1.05);
 		transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease;
-		filter: saturate(0.7) brightness(0.85);
 	}
-	.replay-card:hover .replay-card__img {
-		transform: scale(1.045);
-		filter: saturate(1) brightness(1);
-	}
-
-	.replay-card__index {
-		position: absolute;
-		top: 0.6rem;
-		left: 0.75rem;
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-size: 2.6rem;
-		line-height: 1;
-		color: rgba(255, 255, 255, 0.55);
-		mix-blend-mode: overlay;
-		pointer-events: none;
-		transition: opacity 0.4s ease;
-	}
-	.replay-card:hover .replay-card__index {
-		opacity: 0.3;
-	}
-
-	.replay-card__overlay {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(9, 9, 8, 0);
-		transition: background 0.25s ease;
-	}
-	.replay-card:hover .replay-card__overlay {
-		background: rgba(9, 9, 8, 0.15);
+	.replay-card:hover .replay-card__img,
+	.replay-card:focus-visible .replay-card__img {
+		transform: scale(1.04);
+		filter: grayscale(0);
 	}
 
 	.replay-card__play {
+		position: absolute;
+		top: 50%;
+		left: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 2.4rem;
-		height: 2.4rem;
-		border: 1px solid rgba(255, 255, 255, 0.7);
-		color: #fff;
+		width: 3rem;
+		height: 3rem;
+		background: #fff;
+		color: #000;
+		border: 1px solid #000;
 		opacity: 0;
-		transform: scale(0.9);
+		transform: translate(-50%, -50%) scale(0.9);
 		transition: opacity 0.25s ease, transform 0.25s ease;
 	}
-	.replay-card:hover .replay-card__play {
+	.replay-card:hover .replay-card__play,
+	.replay-card:focus-visible .replay-card__play {
 		opacity: 1;
-		transform: scale(1);
+		transform: translate(-50%, -50%) scale(1);
 	}
 
-	.replay-card__scrim {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		padding: 2.5rem 1rem 1rem;
-		background: linear-gradient(to top, rgba(9, 9, 8, 0.92) 0%, rgba(9, 9, 8, 0.55) 55%, rgba(9, 9, 8, 0) 100%);
+	.replay-card__caption {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+		flex: 1;
+		padding: 1rem 1.1rem 1.25rem;
 	}
 
-	.replay-card__tag {
-		display: block;
-		margin-bottom: 0.3rem;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.6rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.55);
+	.replay-card__meta {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--muted);
+		transition: color 0.25s ease;
 	}
 
 	.replay-card__title {
-		color: #fff;
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-weight: 500;
-		font-size: 1rem;
-		line-height: 1.3;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: clamp(1.25rem, 2vw, 1.5rem);
+		line-height: 1.08;
+		letter-spacing: -0.03em;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 	}
 
-	.replay-card__date {
-		display: block;
-		margin-top: 0.4rem;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.65rem;
-		letter-spacing: 0.03em;
-		color: rgba(255, 255, 255, 0.6);
+	.replay-card__action {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-top: auto;
+		padding-top: 0.4rem;
+		font-size: 0.85rem;
+		font-weight: 600;
+	}
+
+	.replay-card:hover,
+	.replay-card:focus-visible {
+		background: var(--fg);
+		color: var(--bg);
+	}
+	.replay-card:hover .replay-card__meta,
+	.replay-card:focus-visible .replay-card__meta {
+		color: #d0d0d0;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.title__in { animation: none; transform: none; }
+		.tabs__item,
+		.replay-card,
+		.replay-card__img,
+		.replay-card__play {
+			transition: none;
+		}
+		.replay-card:hover .replay-card__img,
+		.replay-card:focus-visible .replay-card__img {
+			transform: none;
+		}
 	}
 </style>

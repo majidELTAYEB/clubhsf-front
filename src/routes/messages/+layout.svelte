@@ -1,9 +1,9 @@
-<!-- <script lang="ts">
-import { onDestroy } from 'svelte';
+<!-- 
+<script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
 	import ConversationsList from '$lib/features/messaging/components/ConversationsList.svelte';
 	import { unreadStore } from '$lib/features/messaging/unread.svelte';
-
 
 	let { children }: { children: () => unknown } = $props();
 
@@ -38,19 +38,22 @@ import { onDestroy } from 'svelte';
 </div>
 
 <style>
+	@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap');
+
 	.messages-shell {
-	--border: #e6e3db;
-	--header-height: 3.5rem;
-	display: flex;
-	height: 100%;      /* au lieu de 100vh */
-	min-height: 0; 
-	overflow: hidden;
-}
+		--rule: #000000;
+		--header-height: 3.5rem;
+		display: flex;
+		height: 100%;
+		min-height: 0;
+		overflow: hidden;
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
+	}
 
 	.messages-shell__list {
 		width: 22rem;
 		flex-shrink: 0;
-		border-right: 1px solid var(--border);
+		border-right: 1px solid var(--rule);
 		overflow-y: auto;
 	}
 
@@ -62,16 +65,6 @@ import { onDestroy } from 'svelte';
 		flex-direction: column;
 	}
 
-	/* .messages-shell__list {
-    width: 22rem;
-    flex-shrink: 0;
-    border-right: 1px solid var(--border);
-    overflow: hidden;   
-    display: flex;
-    flex-direction: column;
-/* }  */
-
-
 	.messages-shell__empty {
 		margin: auto;
 		text-align: center;
@@ -79,16 +72,16 @@ import { onDestroy } from 'svelte';
 		padding: 1.5rem;
 	}
 	.messages-shell__empty-title {
-		font-family: 'Fraunces', serif;
-		font-style: italic;
-		font-weight: 500;
-		font-size: 1.2rem;
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 800;
+		font-size: 1.5rem;
+		letter-spacing: -0.03em;
 		color: #000;
 	}
 	.messages-shell__empty-body {
-		margin-top: 0.4rem;
-		font-size: 0.82rem;
-		color: #666666;
+		margin-top: 0.5rem;
+		font-size: 0.9rem;
+		color: #6a6a6a;
 	}
 
 	/* Mobile : un seul panneau visible à la fois, chacun prend toute la largeur.
@@ -151,7 +144,6 @@ import { onDestroy } from 'svelte';
 
 	.messages-shell {
 		--rule: #000000;
-		--header-height: 3.5rem;
 		display: flex;
 		height: 100%;
 		min-height: 0;

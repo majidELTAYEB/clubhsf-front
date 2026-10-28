@@ -1,4 +1,4 @@
-<!-- src/lib/components/live-chat.svelte -->
+<!-- src/lib/components/live-chat.svelte
 <script lang="ts">
 	import SendIcon from '@lucide/svelte/icons/send';
 
@@ -274,5 +274,312 @@
 		background: var(--border);
 		color: var(--muted);
 		cursor: not-allowed;
+	}
+</style> -->
+
+
+<!-- src/lib/components/live-chat.svelte -->
+<script lang="ts">
+	import SendIcon from '@lucide/svelte/icons/send';
+
+	type Message = {
+		id: string;
+		viewerId: string;
+		content: string;
+		avatarUrl?: string;
+	};
+
+	let {
+		messages,
+		onSend,
+		disabled = false,
+		placeholder = 'Écrire un message…',
+		viewerCount
+	}: {
+		messages: Message[];
+		onSend?: (content: string) => void;
+		disabled?: boolean;
+		placeholder?: string;
+		viewerCount?: number;
+	} = $props();
+
+	let draft = $state('');
+	let scrollContainer: HTMLDivElement;
+
+	function handleSubmit(e: SubmitEvent) {
+		e.preventDefault();
+		if (!draft.trim() || !onSend) return;
+		onSend(draft.trim());
+		draft = '';
+	}
+
+	$effect(() => {
+		messages.length;
+		scrollContainer?.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+	});
+</script>
+
+<div class="chat">
+	<div class="chat__head">
+		<span class="chat__title">Chat en direct</span>
+		{#if viewerCount !== undefined}
+			<span class="chat__viewers">
+				<span class="pulse"><span class="pulse__ring"></span><span class="pulse__dot"></span></span>
+				{viewerCount} spectateur{viewerCount > 1 ? 's' : ''}
+			</span>
+		{/if}
+	</div>
+
+	<div bind:this={scrollContainer} class="chat__messages">
+		{#each messages as msg (msg.id)}
+			<div class="message">
+				<div class="message__avatar">
+					{#if msg.avatarUrl}
+						<img src={msg.avatarUrl} alt={msg.viewerId} />
+					{:else}
+						<span>{msg.viewerId?.[0]?.toUpperCase()}</span>
+					{/if}
+				</div>
+				<p class="message__body">
+					<span class="message__author">{msg.viewerId}</span>
+					<span class="message__content">{msg.content}</span>
+				</p>
+			</div>
+		{:else}
+			<div class="chat__empty">
+				<p>Aucun message pour le moment.</p>
+			</div>
+		{/each}
+	</div>
+
+	{#if onSend}
+		<form onsubmit={handleSubmit} class="chat__form">
+			<input
+				bind:value={draft}
+				{placeholder}
+				{disabled}
+				class="chat__input"
+				type="text"
+			/>
+			<button
+				type="submit"
+				class="chat__send"
+				disabled={disabled || !draft.trim()}
+				aria-label="Envoyer"
+			>
+				<SendIcon size={15} strokeWidth={2} />
+			</button>
+		</form>
+	{/if}
+</div>
+
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap');
+
+	/* Pas de bordure extérieure : le cadre est porté par .stage de la page */
+	.chat {
+		--bg: #ffffff;
+		--fg: #000000;
+		--muted: #6a6a6a;
+		--rule: #000000;
+
+		display: flex;
+		width: 100%;
+		height: 100%;
+		/* max-height: 600px; borne dure, indépendante des parents */
+		flex-direction: column;
+		background: var(--bg);
+		color: var(--fg);
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
+		overflow: hidden; /* empêche .chat lui-même de grandir */
+	}
+
+	.chat__head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.85rem 1rem;
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.chat__title {
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.05rem;
+		letter-spacing: -0.02em;
+	}
+
+	.chat__viewers {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--muted);
+	}
+
+	/* Pastille pleine en noir sur fond blanc */
+	.pulse {
+		position: relative;
+		display: inline-flex;
+		width: 0.45rem;
+		height: 0.45rem;
+	}
+	.pulse__ring {
+		position: absolute;
+		inset: 0;
+		border-radius: 9999px;
+		background: var(--fg);
+		opacity: 0.6;
+		animation: pulse-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+	}
+	.pulse__dot {
+		position: relative;
+		display: block;
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 9999px;
+		background: var(--fg);
+	}
+	@keyframes pulse-ping {
+		75%,
+		100% {
+			transform: scale(2.2);
+			opacity: 0;
+		}
+	}
+
+	/* Messages */
+	.chat__messages {
+		flex: 1;
+		overflow-y: auto;
+		min-height: 0;
+		padding: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+	}
+
+	.message {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.6rem;
+	}
+
+	/* Avatar carré, initiale en noir plein */
+	.message__avatar {
+		flex-shrink: 0;
+		width: 1.6rem;
+		height: 1.6rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--rule);
+		background: var(--fg);
+		color: #fff;
+		overflow: hidden;
+		font-size: 0.72rem;
+		font-weight: 600;
+	}
+	.message__avatar img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.message__body {
+		min-width: 0;
+		font-size: 0.9rem;
+		line-height: 1.45;
+		overflow-wrap: anywhere;
+	}
+	.message__author {
+		font-weight: 600;
+	}
+	.message__content {
+		margin-left: 0.3rem;
+		color: var(--fg);
+	}
+
+	.chat__empty {
+		display: flex;
+		height: 100%;
+		align-items: center;
+		justify-content: center;
+	}
+	.chat__empty p {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--muted);
+	}
+
+	/* Formulaire : champ et bouton collés, bordures noires partagées */
+	.chat__form {
+		display: flex;
+		align-items: stretch;
+		padding: 0.75rem;
+		border-top: 1px solid var(--rule);
+	}
+
+	.chat__input {
+		flex: 1;
+		min-width: 0;
+		padding: 0.6rem 0.8rem;
+		border: 1px solid var(--rule);
+		border-radius: 0;
+		background: var(--bg);
+		color: var(--fg);
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
+		font-size: 0.9rem;
+	}
+	.chat__input::placeholder {
+		color: var(--muted);
+	}
+	.chat__input:focus,
+.chat__input:focus-visible {
+	outline: none;
+}
+	.chat__input:disabled {
+		background: #f2f2f2;
+		color: var(--muted);
+		cursor: not-allowed;
+	}
+
+	.chat__send {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 2.8rem;
+		border: 1px solid var(--rule);
+		border-left: none;
+		border-radius: 0;
+		background: var(--fg);
+		color: #fff;
+		cursor: pointer;
+		transition: background-color 0.2s ease, color 0.2s ease;
+	}
+	.chat__send:hover:not(:disabled) {
+		background: var(--bg);
+		color: var(--fg);
+	}
+	.chat__send:focus-visible {
+		outline: 2px solid var(--fg);
+		outline-offset: 2px;
+	}
+	.chat__send:disabled {
+		background: #f2f2f2;
+		color: var(--muted);
+		cursor: not-allowed;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pulse__ring {
+			animation: none;
+		}
+		.chat__send {
+			transition: none;
+		}
 	}
 </style>

@@ -2,24 +2,23 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import UserRound from "@lucide/svelte/icons/user-round";
-    import LibraryIcon from "@lucide/svelte/icons/library";
-    	import Webcam from "@lucide/svelte/icons/webcam";
-			import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
-			import UsersRound from "@lucide/svelte/icons/users-round";
+	import LibraryIcon from "@lucide/svelte/icons/library";
+	import Webcam from "@lucide/svelte/icons/webcam";
+	import MessageCircleIcon from "@lucide/svelte/icons/message-circle";
+	import UsersRound from "@lucide/svelte/icons/users-round";
 	import { unreadStore } from '$lib/features/messaging/unread.svelte';
 
 	const items = [
 		{ href: '/masterclass', label: 'Masterclass', icon: LibraryIcon },
 		{ href: '/lives', label: 'Lives', icon: Webcam },
 		{ href: '/community/posts', label: 'Communauté', icon: UsersRound },
-		{href: '/messages', label: 'Messages', icon: MessageCircleIcon },
+		{ href: '/messages', label: 'Messages', icon: MessageCircleIcon },
 		{ href: '/profile', label: 'Profil', icon: UserRound },
 	];
 
 	function isActive(href: string) {
 		return page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
 	}
-
 </script>
 
 <nav class="bottom-nav" aria-label="Navigation principale">
@@ -32,7 +31,7 @@
 			aria-current={active ? 'page' : undefined}
 		>
 			<span class="bottom-nav__icon">
-				<item.icon size={17} strokeWidth={active ? 2 : 1.6} />
+				<item.icon size={18} strokeWidth={active ? 2 : 1.6} />
 				{#if item.href === '/messages' && unreadStore.hasUnread}
 					<span class="bottom-nav__dot" aria-label="Nouveaux messages"></span>
 				{/if}
@@ -43,13 +42,13 @@
 </nav>
 
 <style>
-	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
+	@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600&display=swap');
 
 	.bottom-nav {
 		--bg: #ffffff;
-		--fg: #121210;
-		--muted: #9b978f;
-		--border: #e6e3db;
+		--fg: #000000;
+		--muted: #6a6a6a;
+		--rule: #000000;
 
 		display: none;
 		/* position: fixed; */
@@ -59,9 +58,9 @@
 		z-index: 90; */
 		flex-shrink: 0;
 		background: var(--bg);
-		border-top: 1px solid var(--border);
+		border-top: 1px solid var(--rule);
 		/* padding-bottom: env(safe-area-inset-bottom); */
-		font-family: 'Inter', sans-serif;
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
 	}
 
 	@media (max-width: 767px) {
@@ -72,18 +71,28 @@
 		}
 	}
 
+	/* Chaque entrée est une cellule séparée par un filet noir ;
+	   l'entrée active s'inverse en noir, comme les lignes d'annuaire au survol */
 	.bottom-nav__item {
 		display: flex;
 		flex: 1;
+		min-width: 0;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 0.3rem;
-		padding: 0.6rem 0.25rem 0.55rem;
+		gap: 0.35rem;
+		padding: 0.7rem 0.25rem 0.65rem;
 		color: var(--muted);
 		text-decoration: none;
 		-webkit-tap-highlight-color: transparent;
-		transition: color 0.15s ease;
+		transition: background-color 0.18s ease, color 0.18s ease;
+	}
+	.bottom-nav__item + .bottom-nav__item {
+		border-left: 1px solid var(--rule);
+	}
+	.bottom-nav__item:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: -4px;
 	}
 
 	.bottom-nav__item:active .bottom-nav__icon {
@@ -95,41 +104,46 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 2.15rem;
-		height: 2.15rem;
-		border: 1px solid transparent;
-		color: var(--muted);
-		transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
-	}
-
-	.bottom-nav__item--active .bottom-nav__icon {
-		background: var(--fg);
-		border-color: var(--fg);
-		color: #fff;
-	}
-
-	.bottom-nav__dot {
-		position: absolute;
-		top: 0.15rem;
-		right: 0.15rem;
-		width: 0.45rem;
-		height: 0.45rem;
-		border-radius: 50%;
-		background: #e53e3e;
-		border: 1.5px solid var(--bg);
-	}
-
-	.bottom-nav__label {
-		font-size: 0.62rem;
-		font-weight: 500;
-		letter-spacing: 0.02em;
-		line-height: 1;
+		height: 1.5rem;
+		transition: transform 0.12s ease;
 	}
 
 	.bottom-nav__item--active {
-		color: var(--fg);
+		background: var(--fg);
+		color: #fff;
 	}
-	.bottom-nav__item--active .bottom-nav__label {
+
+	/* Pastille "non lu" : noire au repos, blanche sur la cellule active */
+	.bottom-nav__dot {
+		position: absolute;
+		top: -0.1rem;
+		right: -0.35rem;
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--fg);
+		border: 1.5px solid var(--bg);
+	}
+	.bottom-nav__item--active .bottom-nav__dot {
+		background: #fff;
+		border-color: var(--fg);
+	}
+
+	.bottom-nav__label {
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 0.66rem;
 		font-weight: 600;
+		letter-spacing: 0.01em;
+		line-height: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bottom-nav__item,
+		.bottom-nav__icon {
+			transition: none;
+		}
 	}
 </style>

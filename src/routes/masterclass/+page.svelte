@@ -245,8 +245,8 @@
 		display: flex;
 		align-items: center;
 		gap: 1.25rem;
-		padding: 1rem 1.5rem;
-		padding-top: calc(1rem + env(safe-area-inset-top));
+		/* padding: 1rem 1.5rem; */
+		/* padding-top: calc(1rem + env(safe-area-inset-top)); */
 		border-bottom: 1px solid var(--rule);
 	}
 

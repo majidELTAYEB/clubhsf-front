@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import BellIcon from '@lucide/svelte/icons/bell';
@@ -538,5 +538,609 @@
 	.load-more-btn:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+</style> -->
+
+
+<!-- src/lib/features/notifications/components/NotificationCenter.svelte -->
+<script lang="ts">
+	import { fly, fade } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
+	import BellIcon from '@lucide/svelte/icons/bell';
+	import XIcon from '@lucide/svelte/icons/x';
+	import FileTextIcon from '@lucide/svelte/icons/file-text';
+	import VideoIcon from '@lucide/svelte/icons/video';
+	import RadioIcon from '@lucide/svelte/icons/radio';
+	import HeartIcon from '@lucide/svelte/icons/heart';
+	import MessageCircleIcon from '@lucide/svelte/icons/message-circle';
+	import CheckCheckIcon from '@lucide/svelte/icons/check-check';
+	import { goto } from '$app/navigation';
+	import {
+		listNotifications,
+		markNotificationRead,
+		markAllNotificationsRead
+	} from '$lib/features/notifications/api';
+	import type { AppNotification, NotificationType } from '$lib/features/notifications/types';
+
+	let open = $state(false);
+	let isMobile = $state(false);
+	let notifications = $state<AppNotification[]>([]);
+	let nextCursor = $state<string | undefined>(undefined);
+	let unreadCount = $state(0);
+	let loading = $state(true);
+	let loadingMore = $state(false);
+	let markingAll = $state(false);
+	let loadError = $state<string | null>(null);
+	let hasLoadedOnce = $state(false);
+
+	async function loadUnreadCount() {
+		try {
+			const res = await listNotifications(undefined, 1);
+			unreadCount = res.unread_count;
+		} catch {
+			// Échec silencieux : simple compteur, pas critique.
+		}
+	}
+
+	async function loadFull() {
+		loading = true;
+		loadError = null;
+		try {
+			const res = await listNotifications();
+			notifications = res.notifications;
+			nextCursor = res.next_cursor;
+			unreadCount = res.unread_count;
+			hasLoadedOnce = true;
+		} catch (err) {
+			loadError = err instanceof Error ? err.message : 'Impossible de charger les notifications';
+		} finally {
+			loading = false;
+		}
+	}
+
+	async function loadMore() {
+		if (!nextCursor || loadingMore) return;
+		loadingMore = true;
+		try {
+			const res = await listNotifications(nextCursor);
+			notifications = [...notifications, ...res.notifications];
+			nextCursor = res.next_cursor;
+		} catch {
+			// idem, échec silencieux, le bouton reste cliquable
+		} finally {
+			loadingMore = false;
+		}
+	}
+
+	function toggle() {
+		open = !open;
+		if (open && !hasLoadedOnce) loadFull();
+	}
+
+	function close() {
+		open = false;
+	}
+
+	async function handleClick(n: AppNotification) {
+		if (!n.read) {
+			n.read = true;
+			unreadCount = Math.max(0, unreadCount - 1);
+			try {
+				await markNotificationRead(n.id);
+			} catch {
+				// pas de rollback visuel, pas assez grave pour perturber la nav
+			}
+		}
+		close();
+		if (n.link) goto(n.link);
+	}
+
+	async function handleMarkAllRead() {
+		if (markingAll || unreadCount === 0) return;
+		markingAll = true;
+		const previous = notifications.map((n) => n.read);
+		notifications = notifications.map((n) => ({ ...n, read: true }));
+		unreadCount = 0;
+		try {
+			await markAllNotificationsRead();
+		} catch {
+			notifications = notifications.map((n, i) => ({ ...n, read: previous[i] }));
+			unreadCount = notifications.filter((n) => !n.read).length;
+		} finally {
+			markingAll = false;
+		}
+	}
+
+	function iconFor(type: NotificationType) {
+		switch (type) {
+			case 'new_article':
+				return FileTextIcon;
+			case 'new_video':
+				return VideoIcon;
+			case 'live_scheduled':
+			case 'live_starting_soon':
+				return RadioIcon;
+			case 'post_liked':
+				return HeartIcon;
+			case 'post_commented':
+				return MessageCircleIcon;
+			default:
+				return BellIcon;
+		}
+	}
+
+	function formatRelative(iso: string): string {
+		const diffMs = Date.now() - new Date(iso).getTime();
+		const diffMin = Math.round(diffMs / 60000);
+		if (diffMin < 1) return "À l'instant";
+		if (diffMin < 60) return `${diffMin} min`;
+		const diffH = Math.round(diffMin / 60);
+		if (diffH < 24) return `${diffH} h`;
+		const diffDays = Math.round(diffH / 24);
+		return `${diffDays} j`;
+	}
+
+	$effect(() => {
+		loadUnreadCount();
+	});
+
+	$effect(() => {
+		const mq = window.matchMedia('(max-width: 639px)');
+		function update() {
+			isMobile = mq.matches;
+		}
+		update();
+		mq.addEventListener('change', update);
+		return () => mq.removeEventListener('change', update);
+	});
+
+	$effect(() => {
+		if (!open) return;
+		function handleKeydown(e: KeyboardEvent) {
+			if (e.key === 'Escape') close();
+		}
+		window.addEventListener('keydown', handleKeydown);
+		return () => window.removeEventListener('keydown', handleKeydown);
+	});
+</script>
+
+<div class="notif-center">
+	<button type="button" class="bell-btn" onclick={toggle} aria-label="Notifications">
+		<BellIcon size={18} strokeWidth={2} />
+		{#if unreadCount > 0}
+			<span class="bell-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+		{/if}
+	</button>
+
+	{#if open}
+		<div class="notif-overlay" onclick={close} transition:fade={{ duration: 180 }}></div>
+
+		<div class="notif-panel" transition:fly={{ y: isMobile ? 24 : -12, duration: 220, easing: cubicOut }}>
+			<div class="notif-panel__head">
+				<span class="notif-panel__title">Notifications</span>
+				<button type="button" class="notif-panel__close" onclick={close} aria-label="Fermer">
+					<XIcon size={16} strokeWidth={2} />
+				</button>
+			</div>
+
+			{#if unreadCount > 0}
+				<div class="notif-panel__toolbar">
+					<button
+						type="button"
+						class="mark-all-btn"
+						onclick={handleMarkAllRead}
+						disabled={markingAll}
+					>
+						<CheckCheckIcon size={14} strokeWidth={2} />
+						Tout marquer comme lu
+					</button>
+				</div>
+			{/if}
+
+			<div class="notif-panel__body">
+				{#if loading}
+					{#each Array(4) as _}
+						<div class="skeleton-row">
+							<div class="skeleton-line skeleton-line--title"></div>
+							<div class="skeleton-line skeleton-line--body"></div>
+						</div>
+					{/each}
+				{:else if loadError}
+					<div class="empty-state">
+						<p class="empty-state__title">Erreur de chargement</p>
+						<p class="empty-state__body">{loadError}</p>
+					</div>
+				{:else if notifications.length === 0}
+					<div class="empty-state">
+						<p class="empty-state__title">Aucune notification</p>
+						<p class="empty-state__body">Tu seras prévenu ici dès que quelque chose arrive.</p>
+					</div>
+				{:else}
+					{#each notifications as n (n.id)}
+						{@const Icon = iconFor(n.type)}
+						<button
+							type="button"
+							class="notif-item"
+							class:notif-item--unread={!n.read}
+							onclick={() => handleClick(n)}
+						>
+							<span class="notif-item__icon">
+								<Icon size={16} strokeWidth={2} />
+							</span>
+							<span class="notif-item__content">
+								<span class="notif-item__title">{n.title}</span>
+								{#if n.body}
+									<span class="notif-item__body">{n.body}</span>
+								{/if}
+								<span class="notif-item__time">{formatRelative(n.created_at)}</span>
+							</span>
+							{#if !n.read}
+								<span class="unread-dot" aria-hidden="true"></span>
+							{/if}
+						</button>
+					{/each}
+
+					{#if nextCursor}
+						<button type="button" class="load-more-btn" onclick={loadMore} disabled={loadingMore}>
+							{loadingMore ? 'Chargement…' : 'Charger plus'}
+						</button>
+					{/if}
+				{/if}
+			</div>
+		</div>
+	{/if}
+</div>
+
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap');
+
+	.notif-center {
+		--bg: #ffffff;
+		--fg: #000000;
+		--muted: #6a6a6a;
+		--rule: #000000;
+
+		position: relative;
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
+	}
+
+	.notif-center button:focus-visible {
+		outline: 2px solid var(--fg);
+		outline-offset: 2px;
+	}
+
+	/* Cloche : s'inverse au survol, comme les onglets et les cartes */
+	.bell-btn {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		background: var(--bg);
+		border: 1px solid var(--rule);
+		color: var(--fg);
+		cursor: pointer;
+		padding: 0;
+		transition: background-color 0.2s ease, color 0.2s ease;
+	}
+	.bell-btn:hover {
+		background: var(--fg);
+		color: var(--bg);
+	}
+
+	@media (max-width: 639px) {
+		.bell-btn {
+			width: 2.75rem;
+			height: 2.75rem;
+		}
+	}
+
+	/* Compteur carré, noir plein avec liseré blanc pour rester lisible sur la cloche */
+	.bell-badge {
+		position: absolute;
+		top: -0.4rem;
+		right: -0.4rem;
+		min-width: 1.1rem;
+		height: 1.1rem;
+		padding: 0 0.25rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--fg);
+		color: #fff;
+		border: 1px solid #fff;
+		font-size: 0.65rem;
+		font-weight: 600;
+		line-height: 1;
+	}
+
+	/* ===== Panneau flottant ===== */
+	.notif-overlay {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.4);
+		z-index: 100;
+	}
+
+	.notif-panel {
+		position: absolute;
+		top: calc(100% + 0.75rem);
+		right: 0;
+		z-index: 101;
+		width: 360px;
+		max-width: calc(100vw - 2rem);
+		max-height: 70vh;
+		display: flex;
+		flex-direction: column;
+		background: var(--bg);
+		color: var(--fg);
+		border: 1px solid var(--rule);
+	}
+
+	/* Sous 640px : bottom-sheet plein écran plutôt qu'un dropdown ancré */
+	@media (max-width: 639px) {
+		.notif-panel {
+			position: fixed;
+			top: auto;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			width: 100%;
+			max-width: 100%;
+			max-height: 80vh;
+			border-left: none;
+			border-right: none;
+			border-bottom: none;
+			padding-bottom: env(safe-area-inset-bottom);
+		}
+	}
+
+	.notif-panel__head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 1rem 1.25rem;
+		border-bottom: 1px solid var(--rule);
+		flex-shrink: 0;
+	}
+
+	.notif-panel__toolbar {
+		display: flex;
+		padding: 0.6rem 1.25rem;
+		border-bottom: 1px solid var(--rule);
+		flex-shrink: 0;
+	}
+
+	.notif-panel__title {
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.25rem;
+		letter-spacing: -0.03em;
+		line-height: 1.1;
+	}
+
+	.mark-all-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		background: none;
+		border: none;
+		color: var(--muted);
+		font-family: inherit;
+		font-size: 0.8rem;
+		font-weight: 600;
+		cursor: pointer;
+		padding: 0;
+		white-space: nowrap;
+	}
+	.mark-all-btn:hover:not(:disabled) {
+		color: var(--fg);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+	.mark-all-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.notif-panel__close {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: var(--fg);
+		margin: 0;
+		flex-shrink: 0;
+	}
+	.notif-panel__close:hover {
+		opacity: 0.6;
+	}
+
+	.notif-panel__body {
+		overflow-y: auto;
+		flex: 1;
+	}
+
+	/* Item : s'inverse en noir au survol, comme les cartes live */
+	.notif-item {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		width: 100%;
+		padding: 0.9rem 1.25rem;
+		background: var(--bg);
+		color: var(--fg);
+		border: none;
+		border-bottom: 1px solid var(--rule);
+		text-align: left;
+		cursor: pointer;
+		font-family: inherit;
+		transition: background-color 0.2s ease, color 0.2s ease;
+	}
+	.notif-item:last-child {
+		border-bottom: none;
+	}
+	.notif-item:hover,
+	.notif-item:focus-visible {
+		background: var(--fg);
+		color: var(--bg);
+	}
+	.notif-item:focus-visible {
+		outline-offset: -4px;
+	}
+	.notif-item--unread .notif-item__title {
+		font-weight: 700;
+	}
+
+	.notif-item__icon {
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 0.1rem;
+	}
+
+	.notif-item__content {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+
+	.notif-item__title {
+		font-size: 0.92rem;
+		font-weight: 500;
+		line-height: 1.3;
+	}
+
+	.notif-item__body {
+		font-size: 0.85rem;
+		color: var(--muted);
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		transition: color 0.2s ease;
+	}
+
+	.notif-item__time {
+		font-size: 0.78rem;
+		font-weight: 500;
+		color: var(--muted);
+		margin-top: 0.2rem;
+		transition: color 0.2s ease;
+	}
+
+	.notif-item:hover .notif-item__body,
+	.notif-item:hover .notif-item__time,
+	.notif-item:focus-visible .notif-item__body,
+	.notif-item:focus-visible .notif-item__time {
+		color: #d0d0d0;
+	}
+
+	/* Point non lu : carré plein, suit la couleur du texte */
+	.unread-dot {
+		flex-shrink: 0;
+		width: 0.5rem;
+		height: 0.5rem;
+		background: currentColor;
+		margin-top: 0.4rem;
+	}
+
+	/* Empty / error state */
+	.empty-state {
+		padding: 3rem 1.25rem;
+		text-align: left;
+	}
+	.empty-state__title {
+		font-family: 'Bricolage Grotesque', sans-serif;
+		font-weight: 700;
+		font-size: 1.2rem;
+		letter-spacing: -0.02em;
+	}
+	.empty-state__body {
+		margin-top: 0.4rem;
+		font-size: 0.9rem;
+		color: var(--muted);
+	}
+
+	/* Skeleton */
+	.skeleton-row {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		padding: 0.9rem 1.25rem;
+		border-bottom: 1px solid var(--rule);
+	}
+	.skeleton-line {
+		position: relative;
+		background: #eeeeee;
+		overflow: hidden;
+	}
+	.skeleton-line::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		transform: translateX(-100%);
+		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+		animation: skeleton-shimmer 1.6s ease-in-out infinite;
+	}
+	@keyframes skeleton-shimmer {
+		to {
+			transform: translateX(100%);
+		}
+	}
+	.skeleton-line--title {
+		width: 45%;
+		height: 0.8rem;
+	}
+	.skeleton-line--body {
+		width: 75%;
+		height: 0.7rem;
+		margin-top: 0.2rem;
+	}
+
+	.load-more-btn {
+		width: 100%;
+		padding: 0.9rem;
+		background: var(--bg);
+		border: none;
+		border-top: 1px solid var(--rule);
+		color: var(--fg);
+		font-family: inherit;
+		font-size: 0.88rem;
+		font-weight: 600;
+		cursor: pointer;
+		flex-shrink: 0;
+		transition: background-color 0.2s ease, color 0.2s ease;
+	}
+	.load-more-btn:hover:not(:disabled) {
+		background: var(--fg);
+		color: var(--bg);
+	}
+	.load-more-btn:disabled {
+		color: var(--muted);
+		cursor: not-allowed;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bell-btn,
+		.notif-item,
+		.notif-item__body,
+		.notif-item__time,
+		.load-more-btn {
+			transition: none;
+		}
+		.skeleton-line::after {
+			animation: none;
+		}
 	}
 </style>

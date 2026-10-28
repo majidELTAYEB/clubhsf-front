@@ -35,7 +35,8 @@
 	</div>
 {:else if sidebar.isMobile}
 	<Sheet.Root
-		bind:open={() => sidebar.openMobile, (v) => sidebar.setOpenMobile(v)}
+		open={sidebar.openMobile}
+		onOpenChange={(v) => sidebar.setOpenMobile(v)}
 		{...restProps}
 	>
 		<Sheet.Content
@@ -106,3 +107,42 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	/* Bord droit de la sidebar desktop : le composant utilise `border-e` avec la
+	   couleur de bordure globale ; on la force sur --sidebar-border (noir). */
+	div[data-slot="sidebar-container"] {
+		border-color: var(--sidebar-border, #000000);
+	}
+
+	/* Tiroir mobile (Sheet) : rendu dans un portail, donc hors de .sidebar-theme
+	   (défini dans app-sidebar). On lui redonne les mêmes tokens ici, plus un
+	   look plat : carré, sans ombre, bord noir. */
+	:global([data-slot="sidebar"][data-mobile="true"]) {
+		--sidebar: #ffffff;
+		--sidebar-foreground: #000000;
+		--sidebar-primary: #000000;
+		--sidebar-primary-foreground: #ffffff;
+		--sidebar-accent: #000000;
+		--sidebar-accent-foreground: #ffffff;
+		--sidebar-border: #000000;
+		--sidebar-ring: #000000;
+
+		font-family: 'Hanken Grotesk', system-ui, sans-serif;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+		border-color: var(--sidebar-border) !important;
+	}
+	:global([data-slot="sidebar"][data-mobile="true"] [data-sidebar]) {
+		border-radius: 0 !important;
+		box-shadow: none !important;
+	}
+
+	/* Filets noirs entre en-tête, contenu et pied dans le tiroir mobile */
+	:global([data-slot="sidebar"][data-mobile="true"] [data-slot="sidebar-header"]) {
+		border-bottom: 1px solid var(--sidebar-border);
+	}
+	:global([data-slot="sidebar"][data-mobile="true"] [data-slot="sidebar-footer"]) {
+		border-top: 1px solid var(--sidebar-border);
+	}
+</style>
