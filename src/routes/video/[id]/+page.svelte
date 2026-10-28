@@ -1,54 +1,35 @@
 <script lang="ts">
-	import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
-	import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
+	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
+	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import videojs from 'video.js';
 	import 'video.js/dist/video-js.css';
-	import { onMount, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
 
 	let { data } = $props();
 	let video = $derived(data.video);
 	let nextVideo = $derived(data.nextVideo);
 
-	let videoEl: HTMLVideoElement;
+	let videoEl: HTMLVideoElement | undefined = $state();
 	let player: ReturnType<typeof videojs> | undefined;
 
-	let pullZoneHost = $derived(
-		video?.ThumbnailURL ? new URL(video.ThumbnailURL).hostname : ''
-	);
+	let pullZoneHost = $derived(video?.ThumbnailURL ? new URL(video.ThumbnailURL).hostname : '');
 
 	let hlsUrl = $derived(
 		video?.PlaybackURL ||
-		(pullZoneHost && video?.BunnyVideoID
-			? `https://${pullZoneHost}/${video.BunnyVideoID}/playlist.m3u8`
-			: '')
+			(pullZoneHost && video?.BunnyVideoID
+				? `https://${pullZoneHost}/${video.BunnyVideoID}/playlist.m3u8`
+				: '')
 	);
 
-	onMount(() => {
-		if (hlsUrl) {
-			player = videojs(videoEl, {
-				controls: true,
-				fluid: false,
-				responsive: true,
-				preload: 'metadata',
-				poster: video.ThumbnailURL,
-				sources: [{
-					src: hlsUrl,
-					type: 'application/x-mpegURL'
-				}]
-			});
-		}
-	});
-
-	// 👇 réagit à chaque changement de vidéo (navigation vers "suivante")
+	// Un seul point d'entrée : crée le player au premier passage,
+	// puis change juste la source quand on navigue vers la vidéo suivante.
 	$effect(() => {
-		if (!hlsUrl) return;
+		if (!hlsUrl || !videoEl) return;
 
 		if (player) {
-			// player déjà initialisé -> on change juste la source
 			player.poster(video.ThumbnailURL);
 			player.src({ src: hlsUrl, type: 'application/x-mpegURL' });
-		} else if (videoEl) {
-			// pas encore initialisé (premier mount raté / SSR edge case)
+		} else {
 			player = videojs(videoEl, {
 				controls: true,
 				fluid: false,
@@ -97,7 +78,13 @@
 			<div class="byline">
 				<span>{formatDuration(video.DurationSeconds)}</span>
 				<span class="byline__dot">&middot;</span>
-				<span>{new Date(video.CreatedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+				<span>
+					{new Date(video.CreatedAt).toLocaleDateString('fr-FR', {
+						day: '2-digit',
+						month: 'short',
+						year: 'numeric'
+					})}
+				</span>
 			</div>
 		</div>
 
@@ -112,13 +99,18 @@
 			{#if nextVideo}
 				<aside class="archive__aside">
 					<h2 class="section-label">Ensuite</h2>
-					<a href="/video/{nextVideo.video.video_id}?collection={data.collectionId}" class="next-entry">
+					<a
+						href="/video/{nextVideo.video.video_id}?collection={data.collectionId}"
+						class="next-entry"
+					>
 						<div class="next-entry__thumb">
 							<img src={nextVideo.video.thumbnail_url} alt={nextVideo.video.title} />
 						</div>
 						<div class="next-entry__text">
 							<span class="next-entry__title">{nextVideo.video.title}</span>
-							<span class="next-entry__cta">Regarder <ArrowRightIcon size={14} strokeWidth={2} /></span>
+							<span class="next-entry__cta">
+								Regarder <ArrowRightIcon size={14} strokeWidth={2} />
+							</span>
 						</div>
 					</a>
 				</aside>
@@ -130,6 +122,15 @@
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap');
 
+	/* Débloque le scroll du document (une seule fois) */
+	:global(html),
+	:global(body) {
+		height: auto !important;
+		min-height: 100% !important;
+		overflow-y: auto !important;
+		overflow-x: hidden !important;
+	}
+
 	.archive {
 		--bg: #ffffff;
 		--fg: #000000;
@@ -139,7 +140,9 @@
 		background: var(--bg);
 		color: var(--fg);
 		font-family: 'Hanken Grotesk', system-ui, sans-serif;
-		min-height: 100%;
+		min-height: 100dvh;
+		height: auto;
+		overflow: visible;
 	}
 
 	.archive a:focus-visible,
@@ -174,7 +177,9 @@
 		letter-spacing: -0.02em;
 		transition: opacity 0.2s ease;
 	}
-	.back-link:hover { opacity: 0.55; }
+	.back-link:hover {
+		opacity: 0.55;
+	}
 
 	.masthead__category {
 		font-size: 0.85rem;
@@ -227,7 +232,7 @@
 		background-color: #000;
 	}
 
-	/* Heading — titre grand et serré, byline dessous */
+	/* Heading */
 	.heading {
 		margin-top: 2rem;
 		padding-bottom: 1.75rem;
@@ -250,7 +255,9 @@
 		font-weight: 500;
 		color: var(--muted);
 	}
-	.byline__dot { margin: 0 0.5rem; }
+	.byline__dot {
+		margin: 0 0.5rem;
+	}
 
 	/* Body grid */
 	.archive__body {
@@ -283,7 +290,7 @@
 		max-width: 58ch;
 	}
 
-	/* Entrée suivante — carte qui s'inverse en noir au survol */
+	/* Entrée suivante : la carte s'inverse en noir au survol */
 	.next-entry {
 		display: flex;
 		flex-direction: column;
@@ -346,23 +353,10 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.back-link,
 		.next-entry,
 		.next-entry__thumb img {
 			transition: none;
 		}
-	}
-
-	:global(html),
-	:global(body) {
-		height: auto !important;
-		min-height: 100% !important;
-		overflow-y: auto !important;
-		overflow-x: hidden !important;
-	}
-
-	.archive {
-		min-height: 100dvh;
-		height: auto;
-		overflow: visible;
 	}
 </style>

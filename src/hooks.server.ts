@@ -166,7 +166,15 @@ export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, re
 		});
 	}
 
-	const premiumExemptPrefixes = ['/premium', '/auth', '/billing/success', '/billing/cancel'];
+	const premiumExemptPrefixes = [
+	'/premium',
+	'/auth',
+	'/billing/success',
+	'/billing/cancel',
+	'/masterclass',
+	'/video',
+	'/article'
+];
 	const isPremiumExempt =
 		isPublicRoute || premiumExemptPrefixes.some((p) => pathname.startsWith(p));
 

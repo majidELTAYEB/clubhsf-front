@@ -9,6 +9,8 @@
         description?: string;
         cover_image_url?: string;
         is_public: boolean;
+        access_type?: "included" | "paid";
+        price_cents?: number | null;
         created_at: string;
     };
 
@@ -33,6 +35,10 @@
         {
             accessorKey: "is_public",
             header: "Statut",
+        },
+        {
+            accessorKey: "access_type",
+            header: "Accès",
         },
         {
             accessorKey: "slug",
@@ -104,16 +110,8 @@
     import { DragDropProvider } from "@dnd-kit-svelte/svelte";
     import { move } from "@dnd-kit/helpers";
     import { useSortable } from "@dnd-kit-svelte/svelte/sortable";
-	import { updateCollection } from "$lib/features/admin-collection/api";
-       import {
-        createCollection,
-
-    } from "../features/new-video/api";
-	import { object } from "zod";
-
-
-    // ⚠️ Adapte le chemin d'import selon ton projet
-    // import { deleteCollection, updateCollection, createCollection } from "$lib/api";
+    import { updateCollection } from "$lib/features/admin-collection/api";
+    import { createCollection } from "../features/new-video/api";
 
     // 3. Réception des données
     let { data }: { data: Collection[] } = $props();
@@ -168,7 +166,14 @@
     // Création rapide
     let isCreateDialogOpen = $state(false);
     let newTitle = $state("");
+    let newAccessType = $state<"included" | "paid">("included");
+    let newPriceEuros = $state<number | null>(null);
     let isCreating = $state(false);
+
+    let canCreate = $derived(
+        newTitle.trim() !== "" &&
+            (newAccessType === "included" || (newPriceEuros !== null && newPriceEuros > 0))
+    );
 
     // Suppression
     let collectionToDelete = $state<Collection | null>(null);
@@ -182,6 +187,15 @@
         });
     }
 
+    function formatPrice(cents: number | null | undefined) {
+        return ((cents ?? 0) / 100).toLocaleString("fr-FR", {
+            style: "currency",
+            currency: "EUR",
+        });
+    }
+
+    // ⚠️ Ne pas réactiver tel quel dans le menu : le PATCH backend écrase
+    // title / description à chaque appel, il faut renvoyer tous les champs.
     async function handleTogglePublic(collection: Collection) {
         const previous = collection.is_public;
         const index = data.findIndex((c) => c.id === collection.id);
@@ -199,7 +213,7 @@
     }
 
     function handleCopyLink(collection: Collection) {
-        const url = `${window.location.origin}/collection/${collection.slug}`;
+        const url = `${window.location.origin}/masterclass/${collection.id}`;
         navigator.clipboard.writeText(url);
         toast.success("Lien copié dans le presse-papiers");
     }
@@ -221,14 +235,21 @@
 
     async function handleCreate() {
         const title = newTitle.trim();
-        if (title === "") return;
+        if (!canCreate) return;
         isCreating = true;
         try {
-            const result = await createCollection({ title });
-            const newCollection = result.data
+            const result = await createCollection({
+                title,
+                access_type: newAccessType,
+                price_cents:
+                    newAccessType === "paid" ? Math.round((newPriceEuros ?? 0) * 100) : undefined,
+            });
+            const newCollection = result.data;
             data = [newCollection, ...data];
             isCreateDialogOpen = false;
             newTitle = "";
+            newAccessType = "included";
+            newPriceEuros = null;
             toast.success(`"${newCollection.title}" créée`);
             goto(`/admin/collections/${newCollection.id}`);
         } catch (err) {
@@ -462,6 +483,12 @@
                     {:else}
                         <Badge variant="secondary" class="text-muted-foreground">Brouillon</Badge>
                     {/if}
+                {:else if cell.column.id === 'access_type'}
+                    {#if row.original.access_type === 'paid'}
+                        <Badge variant="outline">{formatPrice(row.original.price_cents)}</Badge>
+                    {:else}
+                        <span class="text-muted-foreground text-sm">Abonnement</span>
+                    {/if}
                 {:else if cell.column.id === 'slug'}
                     <code class="text-xs text-muted-foreground">{row.original.slug}</code>
                 {:else if cell.column.id === 'created_at'}
@@ -484,14 +511,10 @@
                                 <SettingsIcon class="mr-2 h-3.5 w-3.5" />
                                 Gérer
                             </DropdownMenu.Item>
-                            <!-- <DropdownMenu.Item onclick={() => handleTogglePublic(row.original)}>
-                                {row.original.is_public ? "Repasser en brouillon" : "Publier"}
-                            </DropdownMenu.Item> -->
                             <DropdownMenu.Item onclick={() => handleCopyLink(row.original)}>
                                 <CopyIcon class="mr-2 h-3.5 w-3.5" />
                                 Copier le lien
                             </DropdownMenu.Item>
-
                         </DropdownMenu.Content>
                     </DropdownMenu.Root>
                 {:else}
@@ -514,19 +537,45 @@
                 Donne un titre à ta collection, tu pourras ajouter les vidéos et lives ensuite.
             </AlertDialog.Description>
         </AlertDialog.Header>
-        <Input
-            bind:value={newTitle}
-            placeholder="Collection débutant 2026"
-            onkeydown={(e) => {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleCreate();
-                }
-            }}
-        />
+
+        <div class="space-y-3">
+            <Input
+                bind:value={newTitle}
+                placeholder="Collection débutant 2026"
+                onkeydown={(e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleCreate();
+                    }
+                }}
+            />
+
+            <select
+                bind:value={newAccessType}
+                class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+            >
+                <option value="included">Incluse dans l'abonnement</option>
+                <option value="paid">Payante (achat à l'unité)</option>
+            </select>
+
+            {#if newAccessType === "paid"}
+                <input
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    bind:value={newPriceEuros}
+                    placeholder="Prix en € (ex : 49)"
+                    class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                />
+                <p class="text-muted-foreground text-xs">
+                    Les abonnés y auront accès sans payer. Les non-abonnés pourront l'acheter.
+                </p>
+            {/if}
+        </div>
+
         <AlertDialog.Footer>
             <AlertDialog.Cancel disabled={isCreating}>Annuler</AlertDialog.Cancel>
-            <Button onclick={handleCreate} disabled={newTitle.trim() === "" || isCreating}>
+            <Button onclick={handleCreate} disabled={!canCreate || isCreating}>
                 {#if isCreating}
                     <Spinner class="size-4 mr-2" /> Création...
                 {:else}
