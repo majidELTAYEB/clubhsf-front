@@ -206,7 +206,7 @@
 
 	$effect(() => {
 		if (isAuthenticated) {
-			goto(resolve('/masterclass'));
+			goto(resolve('/community/posts'));
 		}
 	});
 </script>
