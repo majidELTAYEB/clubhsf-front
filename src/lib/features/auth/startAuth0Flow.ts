@@ -69,7 +69,7 @@ export function startAuth0Flow(
   const verifier = generateCodeVerifier();
   const challenge = generateCodeChallenge(verifier);
   const state = generateState();
-  const redirectTo = url.searchParams.get('redirectTo') ?? '/masterclass';
+  const redirectTo = url.searchParams.get('redirectTo') ?? '/community/posts';
 
   // Priorité aux headers forwarded (ngrok, reverse proxy, prod derrière load balancer)
   // sinon fallback sur url.origin (accès direct sans proxy, ex: localhost sans tunnel)
