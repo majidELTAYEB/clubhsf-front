@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ locals, cookies, url }) => {
 	}
 
 	if (isPremium) {
-		redirect(302, '/masterclass');
+		redirect(302, '/community/posts');
 	}
 
 	return { isPremium };

@@ -235,7 +235,7 @@ export const actions: Actions = {
 		const claims = decodeJwtPayload(tokens.id_token);
 
 		if (claims.email_verified === true) {
-			throw redirect(302, '/masterclass'); // ou la route post-vérification que tu utilises déjà ailleurs
+			throw redirect(302, '/community/posts'); // ou la route post-vérification que tu utilises déjà ailleurs
 		}
 
 		// Toujours pas vérifié → on reste sur la page avec un message dédié
