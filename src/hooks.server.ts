@@ -175,6 +175,8 @@ export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, re
 	'/video',
 	'/article'
 ];
+
+
 	const isPremiumExempt =
 		isPublicRoute || premiumExemptPrefixes.some((p) => pathname.startsWith(p));
 
